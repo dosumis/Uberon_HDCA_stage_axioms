@@ -1,6 +1,6 @@
 ---
 name: fetch-wiki-info-api
-description: Fetch structured and descriptive information from Wikidata and Wikipedia via HTTP APIs (no browser, no Playwright)
+description: Fetch structured and descriptive information from Wikidata and Wikipedia via HTTP APIs (no browser, no Playwright). For developmental timings, read SPECIES-SAFETY.md first -- articles on human structures carry unmarked chick and mouse timings.
 argument-hint: "[search term] [--images]"
 allowed-tools: Bash
 ---
@@ -66,6 +66,19 @@ Markdown with the same overall shape as the Playwright skill, plus an optional *
 - Wikidata: https://www.wikidata.org/wiki/Q#######
 - Wikipedia: https://en.wikipedia.org/wiki/<page>
 ```
+
+## Developmental timings: read SPECIES-SAFETY.md first
+
+Articles on developing anatomical structures mix species without marking the
+change. *Apical ectodermal ridge* returns "stage 20HH" (**chick**); *rhombic
+lip* returns "embryonic day 9.5" and "E15-P15" (**mouse**). Both read as human
+timings to anything matching on numbers alone, and the resulting error is
+invisible on review.
+
+[SPECIES-SAFETY.md](SPECIES-SAFETY.md) gives the accept/reject markers, the
+"weeks of gestation" ambiguity that moves a claim by four to six Carnegie
+stages, and measured hit rates. For human embryonic structures prefer the
+`stage-evidence` skill, which is human-only by construction.
 
 ## Notes
 
