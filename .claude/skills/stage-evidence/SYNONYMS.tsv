@@ -1,0 +1,109 @@
+# Uberon label -> the words O'Rahilly & Muller (1987) actually use, pipe-separated.
+#
+# Why this file is load-bearing: searching the book for an Uberon label and
+# getting nothing looks exactly like the book being silent on the subject. It
+# usually is not. O'Rahilly states outright that "the term placode is avoided",
+# writes "mesoblast" where modern usage has mesoderm, "process" where we say
+# prominence, and "upper/lower limb" for fore/hindlimb. Without this map, a
+# search for "lens placode" returns zero hits in a book that discusses the lens
+# disc across five stages.
+#
+# Every form below was found in the built corpus before being written here --
+# none are guesses. Add to it the same way: probe the corpus, confirm the form
+# occurs, then record it. A speculative synonym that matches nothing is
+# harmless; one that matches the wrong structure is not.
+#
+# uberon_label<TAB>form|form|form
+
+Mullerian duct	paramesonephric duct
+Mullerian tubercle	sinusal tubercle
+allantois	allantoic diverticulum|allantoic primordium
+apical ectodermal ridge	apical ectodermal ridge
+atrial septum primum	septum primum
+atrial septum secundum	septum secundum
+bulbus cordis	conus cordis|conus
+cardiac neural crest	vagal crest|vagal-accessory neural crest|cervical neural crest
+chorionic villus	chorionic villi|primary villi|secondary villi|primitive villi
+floor plate of neural tube	floor plate
+foramen ovale of heart	foramen ovale
+forelimb bud	upper limb bud|upper limb buds
+frontonasal prominence	medial nasal process|lateral nasal process|nasal field
+ganglionic eminence	lateral striatal ridge|medial striatal ridge|striatal field
+gonadal ridge	gonadal ridge|gonadal ridges
+hindlimb bud	lower limb bud|lower limb buds
+indifferent gonad	gonadal primordium|gonadal blastema|gonadal ridge
+lateral plate mesoderm	lateral mesoblastic wings|mesoblast
+lens placode	lens disc|lens discs|lens plate
+lens vesicle	lens vesicle|lens pit
+limb bud	limb bud|limb buds
+liver primordium	hepatic primordium|hepatic diverticulum
+lung bud	lung bud|lung buds|respiratory primordium|pulmonary primordium
+mammary ridge	mammary crest
+mandibular prominence	mandibular process|mandibular arch|mandibular bar
+maxillary prominence	maxillary process|maxillary arch|maxillary field
+metanephric cap	metanephrogenic cap|metanephrogenic mantle
+metanephric mesenchyme	metanephrogenic mantle|nephrogenic cord|nephrogenic capsule
+neural tube mantle layer	mantle zone|mantle or intermediate
+neural tube marginal layer	marginal layer|marginal zone
+neural tube ventricular layer	ependymal
+olfactory pit	nasal pit|nasal pits
+olfactory placode	nasal disc|nasal discs|nasal plate|nasal area
+optic cup	optic cup|optic primordium
+optic vesicle	optic vesicle|optic primordium
+otic placode	otic disc
+otic pit	otic pit|otic invagination
+pancreas dorsal primordium	dorsal pancreas|dorsal pancreatic duct
+pancreas primordium	pancreas|pancreatic
+pancreas ventral primordium	ventral pancreas|ventral pancreatic duct
+pharyngeal arch	pharyngeal arch|pharyngeal arches|visceral arch
+pharyngeal arch 1	pharyngeal arch 1|mandibular arch|first pharyngeal arch
+pharyngeal arch 2	pharyngeal arch 2|hyoid arch|second pharyngeal arch
+pharyngeal arch 3	pharyngeal arch 3|third pharyngeal arch
+pharyngeal arch 4	pharyngeal arch 4|fourth pharyngeal arch
+pharyngeal arch 6	pharyngeal arch 6|sixth pharyngeal arch
+pharyngeal arch artery	aortic arch|aortic arches
+pharyngeal arch artery 1	aortic arch 1|first aortic arch|aortic arches 1
+pharyngeal arch artery 2	aortic arch 2|second aortic arch
+pharyngeal arch artery 3	aortic arch 3|third aortic arch
+pharyngeal arch artery 4	aortic arch 4|fourth aortic arch|aortic arches 4
+pharyngeal arch artery 6	aortic arch 6|sixth aortic arch|pulmonary aortic arch
+pharyngeal arch system	aortic arch system|pharyngeal arches|caudal pharyngeal complex
+pharyngeal pouch	pharyngeal pouch|pharyngeal pouches|visceral pouches
+pharyngeal pouch 1	pharyngeal pouch 1|first pharyngeal pouch
+pharyngeal pouch 2	pharyngeal pouch 2|second pouch
+pharyngeal pouch 3	pharyngeal pouch 3
+pharyngeal pouch 4	pharyngeal pouch 4
+posterior neural tube	caudal neural tube|caudal eminence|caudal bud
+proctodeum	anal membrane|anal pit
+pronephric mesoderm	nephrogenic cord|pronephros
+sclerotome	sclerotome|sclerotomes
+septum transversum	septum transversum
+thymus primordium	thymic primordium
+truncus arteriosus	truncus arteriosus|truncus
+ureteric bud	ureteric bud
+vertebral element	vertebral|centrum|sclerotome
+
+# --- Terms confirmed ABSENT from the corpus -----------------------------------
+# Probed and found nowhere in the 1987 text. Listed so a future curator does not
+# repeat the search and so a zero-hit result is distinguishable from an
+# unexplored one. Absence here means "this book does not use these words", NOT
+# "this structure does not exist at these stages" -- go to another source.
+#
+#   heart tube          (O'Rahilly describes "the two endocardial tubes" and
+#                        "the endocardial primordium"; no "heart tube")
+#   ductus arteriosus   (post-embryonic emphasis; not named in stages 1-23)
+#   periderm            (not used)
+#   myotome             (dermatome and sclerotome appear; myotome does not)
+#   limb field          (no "field" usage for limbs; see limb bud)
+#   mammary placode     (only "mammary crest" -- the ridge, not the placode)
+#   pharyngeal arch 6   (the book names arches 1-4; the 6th is not discussed)
+#   limb bud mesenchyme (the book writes of limb-bud mesoblast in passing only)
+#
+# --- Out of scope entirely ----------------------------------------------------
+# O'Rahilly & Muller 1987 covers the EMBRYONIC period: Carnegie stages 1-23,
+# ending ~56-60 postovulatory days. Anything fetal is not in this corpus and
+# cannot be checked against it at all. From the current axiom table that means:
+# alveolus of lung, lung saccule, brown adipose tissue, vernix caseosa,
+# cerebral cortex subventricular zone, cortical preplate, cortical subplate,
+# nephrogenic zone, primary ossification center, secondary ossification center.
+# Do not read "no hits" for these as disagreement with the source.

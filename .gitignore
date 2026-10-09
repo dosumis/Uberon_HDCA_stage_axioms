@@ -4,3 +4,8 @@ __pycache__/
 .venv/
 
 .pytest_cache/
+
+# Local mirror of O'Rahilly & Muller (1987), built by the carnegie-evidence
+# skill. Copyright (c) 1987 Carnegie Institution of Washington -- free to read
+# and cite, not ours to redistribute, so it is a build artifact.
+.evidence-cache/

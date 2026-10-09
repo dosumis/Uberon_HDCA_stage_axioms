@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://w3id.org/taxon-stage-axioms/schema/evidence.schema.json",
+  "title": "Source-attributed evidence for a taxon-scoped existence axiom",
+  "description": "One passage from a named source, quoted verbatim, that bears on when a structure exists in a taxon. Evidence records are the layer between a source and `axioms.tsv`: a row in the axiom table should be traceable to one or more of these, and `evidence_text` there is a curator's summary of what these say. Records are machine-checkable by design -- every field except `note` can be verified against the corpus by `stage_evidence.py verify`, which the Write/Edit hooks run on every edit. A record that cannot be verified is not weak evidence, it is not evidence. Sources are not equal: a corpus that declares a species (O'Rahilly 1987 is human by construction) is checked by provenance, while one that does not (Wikipedia) is checked sentence by sentence -- see `source_tier`.",
+  "type": "object",
+  "required": [
+    "uberon_id",
+    "taxon_id",
+    "stage_id",
+    "claim",
+    "quote",
+    "source_id",
+    "section",
+    "hedged"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "uberon_id": {
+      "type": "string",
+      "pattern": "^UBERON:[0-9]{7}$",
+      "description": "The structure the passage is about. Note that the source will usually not use Uberon's label for it -- see SYNONYMS.tsv -- so this is a curator's identification, and the one field here that genuine judgement goes into."
+    },
+    "uberon_label": {
+      "type": "string",
+      "description": "Uberon's label, for review only. Never the identifier, and deliberately not expected to appear in `quote`."
+    },
+    "taxon_id": {
+      "type": "string",
+      "pattern": "^NCBITaxon:[0-9]+$",
+      "description": "The taxon the passage describes. For a corpus that declares a species this is checked against the source document. For a corpus that does not, the QUOTE ITSELF must name a human frame of reference (human, Carnegie stage, postovulatory, week of gestation) and must not name another animal's staging system (stage 20HH is chick, E9.5 is mouse, hpf is zebrafish). This is enforced, not advised: Wikipedia articles on human structures carry chick and mouse timings in the same voice, and a timing lifted across species is the most plausible-looking error this pipeline exists to stop."
+    },
+    "stage_id": {
+      "type": "string",
+      "pattern": "^HsapDv:[0-9]{7}$|^MmusDv:[0-9]{7}$",
+      "description": "The stage the passage is attributed to. In a stage-segmented corpus this is checked against the section the quote was found in, so a real sentence filed under the wrong stage fails as loudly as an invented one. In a corpus with no stage structure the attribution is the curator's inference and there is nothing to check it against -- so `note` becomes required, to keep the inference visible as an inference."
+    },
+    "stage_label": {
+      "type": "string",
+      "description": "Stage ontology label, for review only."
+    },
+    "claim": {
+      "enum": [
+        "start",
+        "end",
+        "present",
+        "absent"
+      ],
+      "description": "What the passage is being read as saying. `start`/`end`: the structure appears or is gone by this stage. `present`: it is described as existing here without bounding anything -- useful corroboration, not itself an onset. `absent`: the source states it is not yet or no longer there, which bounds the opposite side and is easy to forget to record."
+    },
+    "quote": {
+      "type": "string",
+      "minLength": 25,
+      "description": "The source's own words, copied exactly. Not paraphrased, not trimmed to the convenient clause, not tidied. The minimum length is a crude guard against quoting a fragment so short it could be found anywhere and proves nothing."
+    },
+    "source_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9]*:[A-Za-z0-9_.()-]+$",
+      "description": "The document the quote came from, e.g. `ORahilly1987:stage13` or `Wikipedia:Primitive_streak`. Must exist in the built corpus; this is what scopes the quote check and what determines which species rule applies, so getting it wrong turns a true quote into a failing one rather than letting a misattribution pass."
+    },
+    "section": {
+      "type": "string",
+      "description": "The section heading the quote sits under, e.g. `Urinary System`. Carries the organ-system context that makes a terse passage interpretable, and gives the verifier a second, independent thing to agree about."
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Stable URL for the passage, so a reviewer can read around the quote."
+    },
+    "source_tier": {
+      "enum": [
+        "primary",
+        "secondary",
+        "tertiary"
+      ],
+      "description": "How much weight the source carries, taken from the corpus rather than judged per record: `primary` is a descriptive account by the people who defined the staging (O'Rahilly & Muller 1987); `tertiary` is an encyclopaedia entry (Wikipedia). Recorded on the record so a reviewer can see at a glance what an axiom rests on, and so a table row resting entirely on tertiary sources is findable. Checked against the corpus if given."
+    },
+    "hedged": {
+      "type": "boolean",
+      "description": "Whether the source is committing to this. O'Rahilly says a ureteric bud 'may possibly be present' at stage 13 and that 'further confirmation is needed', then states plainly at stage 14 that it 'acquires a metanephrogenic cap'. Quote the first without recording the hedge and the source's doubt silently becomes our certainty. Set automatically-detectable hedges honestly: the verifier reads the quote and rejects a record that drops one."
+    },
+    "evidence_code": {
+      "type": "string",
+      "pattern": "^ECO:[0-9]{7}$|^$",
+      "description": "ECO code for the kind of support. For a published descriptive morphological account, ECO:0000304 (author statement from published clinical study) or ECO:0007661 are the usual fits; leave empty rather than guess."
+    },
+    "note": {
+      "type": "string",
+      "description": "A curator's reading of the passage: why it supports the claim, what it does not settle, how it sits against other records. The only free-text field, and the only one a machine cannot check -- keep interpretation here and out of `quote`. Required when the source carries no stage structure of its own, because then the stage attribution IS interpretation and must not be presented as the source's."
+    },
+    "curator": {
+      "type": "string",
+      "description": "Who made the identification. `latent` is not valid here: a record exists precisely because something was read, so an unattributed one is a contradiction."
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "ISO date the record was made."
+    }
+  }
+}
