@@ -1,0 +1,20 @@
+# Any taxon-scoped GCI that did not get a named class.
+#
+# This is the failure mode the whole repo exists to avoid, and it is silent:
+# an unexpanded GCI materialises as nothing, so the axiom is present, correct,
+# and invisible. Run after expand.ru; a non-empty result is a build failure.
+
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
+PREFIX TSA:  <https://w3id.org/taxon-stage-axioms/>
+
+SELECT ?structure ?taxon WHERE {
+  ?ax a owl:Axiom ; owl:annotatedSource ?lhs ; owl:annotatedProperty rdfs:subClassOf .
+  ?lhs owl:intersectionOf/rdf:rest*/rdf:first ?structure .
+  FILTER(isIRI(?structure))
+  ?lhs owl:intersectionOf/rdf:rest*/rdf:first ?tx .
+  ?tx owl:onProperty obo:RO_0002162 ; owl:someValuesFrom ?taxon .
+  FILTER NOT EXISTS { ?gen TSA:scoped_from ?structure ; TSA:scoped_to ?taxon }
+}

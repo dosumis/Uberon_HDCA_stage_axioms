@@ -1,0 +1,25 @@
+uberon_id	uberon_label	taxon_id	taxon_label	onset_type	predicate	stage_id	stage_label	evidence_code	evidence_text	source	curator	date	status
+UBERON:0004141	heart tube	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000016	Carnegie stage 09		paired endocardial tubes fuse to a single heart tube at CS9 (~20 dpo)		latent	2026-10-09	proposed
+UBERON:0004141	heart tube	NCBITaxon:9606	Homo sapiens	point	RO:0002492	HsapDv:0000018	Carnegie stage 11		looping is complete and chamber identity established by CS11-12; the tube is no longer present as such		latent	2026-10-09	proposed
+UBERON:0005417	forelimb bud	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000019	Carnegie stage 12		upper limb bud appears at CS12 (~26 dpo)		latent	2026-10-09	proposed
+UBERON:0005417	forelimb bud	NCBITaxon:9606	Homo sapiens	point	RO:0002492	HsapDv:0000025	Carnegie stage 18		digital rays separate and the bud is no longer a bud by CS18		latent	2026-10-09	proposed
+UBERON:0005418	hindlimb bud	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000020	Carnegie stage 13		lower limb bud appears at CS13, one stage after the forelimb		latent	2026-10-09	proposed
+UBERON:0005418	hindlimb bud	NCBITaxon:9606	Homo sapiens	point	RO:0002492	HsapDv:0000026	Carnegie stage 19		foot plate and digital rays by CS19		latent	2026-10-09	proposed
+UBERON:0004023	ganglionic eminence	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000022	Carnegie stage 15		lateral and medial ganglionic eminences are distinguishable from CS15		latent	2026-10-09	proposed
+UBERON:0004023	ganglionic eminence	NCBITaxon:9606	Homo sapiens	interval	RO:0002497	HsapDv:0000037	fetal stage		the eminences regress during the fetal period; the exact stage needs a source		latent	2026-10-09	proposed
+UBERON:0004008	cerebellar plate	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000023	Carnegie stage 16		paired cerebellar plates form from the rhombic lip at CS16		latent	2026-10-09	proposed
+UBERON:0006215	rhombic lip	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000021	Carnegie stage 14		rhombic lip is present from CS14		latent	2026-10-09	proposed
+UBERON:0004128	optic vesicle	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000018	Carnegie stage 11		optic vesicles evaginate from the forebrain at CS11		latent	2026-10-09	proposed
+UBERON:0004128	optic vesicle	NCBITaxon:9606	Homo sapiens	point	RO:0002492	HsapDv:0000020	Carnegie stage 13		the vesicle invaginates to form the optic cup at CS13		latent	2026-10-09	proposed
+UBERON:0003072	optic cup	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000020	Carnegie stage 13		optic cup forms by invagination of the optic vesicle at CS13		latent	2026-10-09	proposed
+UBERON:0000118	lung bud	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000019	Carnegie stage 12		respiratory diverticulum evaginates from the foregut at CS12 (~4 weeks)		latent	2026-10-09	proposed
+UBERON:0005562	thymus primordium	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000020	Carnegie stage 13		third pharyngeal pouch endoderm forms the thymic primordium at CS13-14		latent	2026-10-09	proposed
+UBERON:0000081	metanephros	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000021	Carnegie stage 14		ureteric bud contacts metanephric mesenchyme at CS14 (~5 weeks)		latent	2026-10-09	proposed
+UBERON:0005294	gonadal ridge	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000022	Carnegie stage 15		gonadal ridge thickens on the mesonephros at CS15		latent	2026-10-09	proposed
+UBERON:0009117	indifferent gonad	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000022	Carnegie stage 15		bipotential gonad present from CS15		latent	2026-10-09	proposed
+UBERON:0009117	indifferent gonad	NCBITaxon:9606	Homo sapiens	point	RO:0002492	HsapDv:0000027	Carnegie stage 20		gonadal sex differentiation is underway by CS20; the gonad is no longer indifferent		latent	2026-10-09	proposed
+UBERON:0002241	chondrocranium	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000023	Carnegie stage 16		cartilaginous skull base is established at CS16; ossification begins later		latent	2026-10-09	proposed
+UBERON:0003076	posterior neural tube	NCBITaxon:9606	Homo sapiens	point	RO:0002488	HsapDv:0000017	Carnegie stage 10		neural folds begin to fuse at CS10; posterior neuropore closes at CS12		latent	2026-10-09	proposed
+UBERON:0003089	sclerotome	NCBITaxon:9606	Homo sapiens	interval	RO:0002496	HsapDv:0000019	Carnegie stage 12		sclerotomes form progressively in a rostrocaudal sequence as somites differentiate; no single onset stage		latent	2026-10-09	proposed
+UBERON:0004363	pharyngeal arch artery	NCBITaxon:9606	Homo sapiens	interval	RO:0002496	HsapDv:0000019	Carnegie stage 12		the arch arteries appear and remodel in sequence across CS12-CS20		latent	2026-10-09	proposed
+UBERON:0010913	vertebral element	NCBITaxon:9606	Homo sapiens	interval	RO:0002496	HsapDv:0000020	Carnegie stage 13		vertebral elements chondrify in a rostrocaudal sequence; serial, not a point onset		latent	2026-10-09	proposed

@@ -1,0 +1,23 @@
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(UBERON:=<http://purl.obolibrary.org/obo/UBERON_>)
+Prefix(RO:=<http://purl.obolibrary.org/obo/RO_>)
+Prefix(NCBITaxon:=<http://purl.obolibrary.org/obo/NCBITaxon_>)
+
+# A three-class stand-in for Uberon, enough to show that a bound asserted on a
+# parent reaches a child through the scoped classes. Keeping it tiny means the
+# test says something about the mechanism rather than about Uberon's content.
+Ontology(<https://w3id.org/taxon-stage-axioms/tests/mini-uberon.ofn>
+Declaration(Class(UBERON:0004023))
+Declaration(Class(UBERON:0004024))
+Declaration(Class(UBERON:0004025))
+Declaration(Class(NCBITaxon:9606))
+Declaration(ObjectProperty(RO:0002162))
+AnnotationAssertion(rdfs:label RO:0002162 "in taxon")
+AnnotationAssertion(rdfs:label NCBITaxon:9606 "Homo sapiens")
+AnnotationAssertion(rdfs:label UBERON:0004023 "ganglionic eminence")
+AnnotationAssertion(rdfs:label UBERON:0004024 "medial ganglionic eminence")
+AnnotationAssertion(rdfs:label UBERON:0004025 "lateral ganglionic eminence")
+SubClassOf(UBERON:0004024 UBERON:0004023)
+SubClassOf(UBERON:0004025 UBERON:0004023)
+)

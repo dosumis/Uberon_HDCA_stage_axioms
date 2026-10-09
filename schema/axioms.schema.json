@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://w3id.org/taxon-stage-axioms/schema/axioms.schema.json",
+  "title": "Taxon-scoped existence axiom",
+  "description": "One curated claim that, in a named taxon, an anatomical structure's existence starts or ends at a named developmental stage. One row per claim: a structure with both a start and an end bound has two rows. This table is the source of truth; the OWL is generated from it.",
+  "type": "object",
+  "required": ["uberon_id", "taxon_id", "onset_type", "predicate", "stage_id", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "uberon_id": {
+      "type": "string", "pattern": "^UBERON:[0-9]{7}$",
+      "description": "The anatomical structure the claim is about. Must be a current Uberon class, not an obsolete or merged one."
+    },
+    "uberon_label": {
+      "type": "string",
+      "description": "Uberon's label for uberon_id, carried for human review only. Validation checks it against the ontology; it is never the identifier."
+    },
+    "taxon_id": {
+      "type": "string", "pattern": "^NCBITaxon:[0-9]+$",
+      "description": "The taxon the claim is scoped to. This is what makes the axiom a GCI rather than a species-neutral assertion, and it is why the claim can be true without being true of the structure in every organism."
+    },
+    "taxon_label": {"type": "string", "description": "NCBITaxon's label for taxon_id, for review only."},
+    "onset_type": {
+      "enum": ["point", "interval", "single-stage"],
+      "description": "The curator's judgement about the shape of the claim, from which `predicate` follows. `point`: the structure has a definable onset or offset, so an exact stage can be named and can be wrong. `interval`: the structure appears or resolves progressively across several stages (somites, pharyngeal arch derivatives, serial condensations), so only a bound is assertable. `single-stage`: the structure exists within one stage only. Symmetry is not the criterion -- paired structures can be progressive."
+    },
+    "predicate": {
+      "enum": ["RO:0002488", "RO:0002492", "RO:0002491", "RO:0002496", "RO:0002497"],
+      "description": "existence starts during (RO:0002488), existence ends during (RO:0002492), existence starts and ends during (RO:0002491), existence starts during or after (RO:0002496), existence ends during or before (RO:0002497). Must agree with onset_type: point takes 0002488/0002492, interval takes 0002496/0002497, single-stage takes 0002491."
+    },
+    "stage_id": {
+      "type": "string", "pattern": "^HsapDv:[0-9]{7}$|^MmusDv:[0-9]{7}$",
+      "description": "The developmental stage, from the stage ontology matching taxon_id. Must be consistent with the taxon: an HsapDv stage with a non-human taxon is an error validation rejects."
+    },
+    "stage_label": {"type": "string", "description": "The stage ontology's label for stage_id, for review only."},
+    "evidence_code": {
+      "type": "string", "pattern": "^ECO:[0-9]{7}$|^$",
+      "description": "ECO code for how the claim is supported. Empty means no evidence has been attached yet, which is the state every row starts in and none should ship in."
+    },
+    "evidence_text": {
+      "type": "string",
+      "description": "Free text saying what is being claimed and why, in terms a curator can check against a source. This is the part a reviewer actually reads."
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the claim comes from: a DOI, PMID, ISBN, or URL. Empty means unsourced."
+    },
+    "curator": {
+      "type": "string",
+      "description": "Who made the call. The literal value `latent` marks a claim seeded from a language model's background knowledge and not yet checked by a person -- it is a to-do, not a provenance."
+    },
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "description": "ISO date the row was last touched."},
+    "status": {
+      "enum": ["proposed", "accepted", "superseded"],
+      "description": "`proposed`: drafted, not reviewed. `accepted`: a curator has checked it against the source. `superseded`: kept for the record, excluded from the build."
+    }
+  }
+}

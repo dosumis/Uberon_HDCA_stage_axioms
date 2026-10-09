@@ -1,0 +1,39 @@
+# Materialised scoped bounds, back out as a table.
+#
+# The round trip -- table, OWL, reason, materialise, extract, diff -- is the
+# only cross-check that is not tautological. Comparing a generated OWL file to
+# the table it came from tests the generator and nothing else.
+#
+# The diff will NOT be empty, and that is the interesting part: every extra row
+# is a bound some class inherited through subClassOf that nobody asserted. That
+# inference supplies most of the existing bound coverage in Uberon, so seeing it
+# explicitly is the point rather than a nuisance.
+
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
+PREFIX TSA:  <https://w3id.org/taxon-stage-axioms/>
+
+SELECT DISTINCT ?uberon_id ?uberon_label ?taxon_id ?predicate ?stage_id ?stage_label WHERE {
+  ?gen TSA:scoped_from ?u ; TSA:scoped_to ?t .
+  # MUST run after materialisation, not on the expanded file.
+  #
+  # Minting the class does not put the GCI's consequent on it as RDF: linking
+  # GEN to `starts_during some S` is the entailment
+  #   GEN = (X and in_taxon some T),  (X and in_taxon some T) SubClassOf R
+  #   therefore GEN SubClassOf R
+  # which needs a reasoner. Worse, the bnode the macro shares with the GCI does
+  # not survive an OWLAPI round trip, so there is no RDF path to walk either.
+  # relation-graph asserts the edge on ?gen directly; this query reads that.
+  ?gen rdfs:subClassOf ?r .
+  ?r owl:onProperty ?p ; owl:someValuesFrom ?s .
+  VALUES ?p { obo:RO_0002488 obo:RO_0002492 obo:RO_0002491 obo:RO_0002496 obo:RO_0002497 }
+  OPTIONAL { ?u rdfs:label ?ul } OPTIONAL { ?s rdfs:label ?sl }
+  BIND(REPLACE(STR(?u), "^.*/", "") AS ?uberon_id)
+  BIND(REPLACE(STR(?t), "^.*/", "") AS ?taxon_id)
+  BIND(REPLACE(STR(?p), "^.*/", "") AS ?predicate)
+  BIND(REPLACE(STR(?s), "^.*/", "") AS ?stage_id)
+  BIND(COALESCE(?ul, "") AS ?uberon_label)
+  BIND(COALESCE(?sl, "") AS ?stage_label)
+}
+ORDER BY ?uberon_id ?predicate

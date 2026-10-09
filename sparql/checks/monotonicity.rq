@@ -1,0 +1,44 @@
+# A structure cannot start before the thing it develops from.
+#
+# Not an OWL entailment: EL has no arithmetic over stages, so no reasoner will
+# catch this. It is a query, and it has to stay one. HsapDv supplies the
+# temporal order that makes it answerable -- 220 immediately_preceded_by and 50
+# preceded_by edges, against the single ordering edge Uberon's species-neutral
+# stages offer between embryonic sub-stages.
+#
+# Caveat worth reading before acting on a hit: Uberon's develops_from edges are
+# species-neutral and some hold only in certain taxa. A violation may be telling
+# you the EDGE does not apply in this taxon rather than that the bound is wrong.
+# Treat output as flags for a curator, never as an error to fail a build on.
+#
+# Needs: the scoped axioms, Uberon's develops_from, and HsapDv's ordering.
+
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
+PREFIX TSA:  <https://w3id.org/taxon-stage-axioms/>
+
+SELECT ?successor ?successor_stage ?precursor ?precursor_stage WHERE {
+  # the successor and its start stage
+  ?gm TSA:scoped_from ?m ; TSA:scoped_to ?taxon .
+  ?gm rdfs:subClassOf [ owl:onProperty ?p1 ; owl:someValuesFrom ?sm ] .
+  VALUES ?p1 { obo:RO_0002488 obo:RO_0002496 }
+
+  # the precursor and its start stage, in the same taxon
+  ?gd TSA:scoped_from ?d ; TSA:scoped_to ?taxon .
+  ?gd rdfs:subClassOf [ owl:onProperty ?p2 ; owl:someValuesFrom ?sd ] .
+  VALUES ?p2 { obo:RO_0002488 obo:RO_0002496 }
+
+  ?m rdfs:subClassOf [ owl:onProperty obo:RO_0002202 ; owl:someValuesFrom ?d ] .
+
+  # violation: the precursor's start stage is preceded by the successor's,
+  # i.e. the thing it develops from starts later than the thing it becomes
+  ?sd obo:BFO_0000062+ ?sm .
+
+  OPTIONAL { ?m rdfs:label ?ml } OPTIONAL { ?d rdfs:label ?dl }
+  OPTIONAL { ?sm rdfs:label ?sml } OPTIONAL { ?sd rdfs:label ?sdl }
+  BIND(COALESCE(?ml, STR(?m)) AS ?successor)
+  BIND(COALESCE(?dl, STR(?d)) AS ?precursor)
+  BIND(COALESCE(?sml, STR(?sm)) AS ?successor_stage)
+  BIND(COALESCE(?sdl, STR(?sd)) AS ?precursor_stage)
+}
