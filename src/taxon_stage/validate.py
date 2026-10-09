@@ -39,6 +39,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from .http import UA, ssl_context
+
 CURIE = re.compile(r"^([A-Za-z][A-Za-z0-9]*):([0-9]+)$")
 
 # Which OLS ontology answers for each prefix. Anything not listed is reported
@@ -56,28 +58,12 @@ ONTOLOGY_FOR_PREFIX = {
 
 OLS = "https://www.ebi.ac.uk/ols4/api"
 WIKIDATA = "https://query.wikidata.org/sparql"
-UA = "taxon-stage-axioms/0.1 (https://github.com/dosumis/taxon-stage-axioms)"
-
-
-def _ssl_context() -> ssl.SSLContext:
-    try:
-        import certifi  # type: ignore
-        return ssl.create_default_context(cafile=certifi.where())
-    except ImportError:
-        pass
-    for path in (os.environ.get("SSL_CERT_FILE"), "/etc/ssl/cert.pem",
-                 "/opt/homebrew/etc/ca-certificates/cert.pem",
-                 os.path.expanduser("~/.homebrew/etc/ca-certificates/cert.pem"),
-                 "/usr/local/etc/ca-certificates/cert.pem"):
-        if path and os.path.exists(path):
-            return ssl.create_default_context(cafile=path)
-    return ssl.create_default_context()
 
 
 def _get(url: str, accept: str = "application/json") -> dict | None:
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
     try:
-        with urllib.request.urlopen(req, timeout=20, context=_ssl_context()) as r:
+        with urllib.request.urlopen(req, timeout=20, context=ssl_context()) as r:
             return json.loads(r.read().decode("utf-8", "replace"))
     except Exception:                                    # noqa: BLE001
         return None

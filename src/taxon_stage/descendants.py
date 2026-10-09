@@ -23,8 +23,15 @@ bound when every Uberon class was scoped.
 from __future__ import annotations
 
 import json
+import ssl
 import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
+
+from .http import UA, ssl_context
 
 ENDPOINT = "https://ubergraph.apps.renci.org/sparql"
 OBO = "http://purl.obolibrary.org/obo/"
@@ -36,28 +43,26 @@ CHUNK = 15
 
 
 def _query(sparql: str, retries: int = 4) -> list[str]:
-    import httpx
-    import time
-
+    """Stdlib only, matching validate.py. Ubergraph drops connections on larger
+    aggregate queries, so retry with backoff rather than concluding the data is
+    absent -- an empty answer here silently shrinks the scoped population."""
+    body = urllib.parse.urlencode({"query": sparql}).encode()
+    req = urllib.request.Request(
+        ENDPOINT, data=body,
+        headers={"User-Agent": UA, "Accept": "application/sparql-results+json"},
+    )
     for attempt in range(retries):
         try:
-            r = httpx.post(
-                ENDPOINT,
-                data={"query": sparql},
-                headers={"Accept": "application/sparql-results+json"},
-                timeout=300,
-            )
-            r.raise_for_status()
-        except (httpx.HTTPError, httpx.TransportError) as exc:
+            with urllib.request.urlopen(req, timeout=300, context=ssl_context()) as r:
+                payload = json.loads(r.read().decode("utf-8", "replace"))
+        except (urllib.error.URLError, ssl.SSLError, TimeoutError, OSError) as exc:
             if attempt == retries - 1:
                 raise
             print(f"  retry {attempt + 1} after {exc}", file=sys.stderr)
             time.sleep(2**attempt)
             continue
-        return [
-            b["d"]["value"].removeprefix(OBO)
-            for b in r.json()["results"]["bindings"]
-        ]
+        return [b["d"]["value"].removeprefix(OBO)
+                for b in payload["results"]["bindings"]]
     raise AssertionError("unreachable")
 
 
