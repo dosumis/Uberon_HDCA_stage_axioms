@@ -125,8 +125,19 @@ def render_scope_all(local_ids: list[str], taxon: str) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_scope_all(ontology_path: Path, out: Path, taxon: str) -> int:
+def write_scope_all(
+    ontology_path: Path, out: Path, taxon: str, restrict_to: set[str] | None = None
+) -> tuple[int, int]:
+    """Returns (written, skipped).
+
+    `restrict_to` should be Uberon's computed taxon subset for this taxon.
+    Without it, scoped classes are generated for terms that cannot exist in the
+    taxon at all -- `Weberian vertebra and in_taxon some Homo sapiens` is an
+    empty class, so any bound it inherits is vacuously true. Harmless logically,
+    noise in the output, and misleading to anyone reading it as a claim.
+    """
     ids = uberon_classes(ontology_path)
+    kept = [i for i in ids if restrict_to is None or i in restrict_to]
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render_scope_all(ids, taxon))
-    return len(ids)
+    out.write_text(render_scope_all(kept, taxon))
+    return len(kept), len(ids) - len(kept)

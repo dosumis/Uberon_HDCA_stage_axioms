@@ -66,9 +66,15 @@ materialize: $(BUILD)/extracted.csv  ## round trip without Uberon (ROBOT only)
 # ROBOT's materialize gives the non-redundant form only; relation-graph gives
 # the closure, and is what Ubergraph itself uses -- so local numbers and
 # Ubergraph numbers are comparable rather than merely similar.
+# UBERON_OBO is the full uberon.obo release, read only for its computed taxon
+# subset tags. They are absent from uberon-base.owl and from Ubergraph, so there
+# is no way to get them from the files the rest of the build uses.
 $(BUILD)/rg-out.tsv: $(BUILD)/axioms.ofn
 	@test -n "$(UBERON)" || (echo "set UBERON=path/to/uberon-base.owl" && exit 1)
-	$(PY) scope-all $(UBERON) -o $(BUILD)/scope-all.ofn --taxon "$(TAXON)"
+	@test -n "$(UBERON_OBO)" || echo "warning: UBERON_OBO unset; scoping every \
+	  Uberon class, including ones that cannot exist in $(TAXON_LABEL)"
+	$(PY) scope-all $(UBERON) -o $(BUILD)/scope-all.ofn --taxon "$(TAXON)" \
+	  $(if $(UBERON_OBO),--uberon-obo $(UBERON_OBO),)
 	$(ROBOT) merge --input $(UBERON) --input $(BUILD)/scope-all.ofn \
 	  --input $(BUILD)/axioms.ofn --output $(BUILD)/merged-full.owl
 	relation-graph --ontology-file $(BUILD)/merged-full.owl --output-file $@ \

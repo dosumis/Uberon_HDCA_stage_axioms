@@ -93,3 +93,51 @@ def test_scope_template_uses_labels_not_curies():
 def test_scope_rejects_a_seed_row_with_no_label():
     with pytest.raises(ValueError, match="label is required"):
         list(rows([("UBERON:0004023", "")], "NCBITaxon:9606", "Homo sapiens"))
+
+
+# --- taxon subset filtering -------------------------------------------------
+
+OBO_SAMPLE = """format-version: 1.2
+
+[Term]
+id: UBERON:0000955
+name: brain
+subset: human_subset
+subset: mouse_subset
+
+[Term]
+id: UBERON:2001190
+name: Weberian vertebra
+subset: uberon_slim
+
+[Term]
+id: UBERON:0004347
+name: limb bud
+subset: human_subset
+"""
+
+
+def test_taxon_subset_members(tmp_path):
+    from taxon_stage.taxon_subset import subset_members
+
+    obo = tmp_path / "u.obo"
+    obo.write_text(OBO_SAMPLE)
+    human = subset_members(obo, "human_subset")
+    assert human == {"UBERON_0000955", "UBERON_0004347"}
+    # the whole point: a fish structure is not tagged for human, so scoping it
+    # would produce an empty class whose inherited bounds are vacuous
+    assert "UBERON_2001190" not in human
+
+
+def test_scope_all_skips_out_of_taxon_terms(tmp_path):
+    from taxon_stage.scope import write_scope_all
+
+    owl = tmp_path / "u.owl"
+    owl.write_text(
+        '<rdf:RDF><owl:Class rdf:about="http://purl.obolibrary.org/obo/UBERON_0000955"/>'
+        '<owl:Class rdf:about="http://purl.obolibrary.org/obo/UBERON_2001190"/></rdf:RDF>'
+    )
+    out = tmp_path / "scope.ofn"
+    written, skipped = write_scope_all(owl, out, "NCBITaxon:9606", {"UBERON_0000955"})
+    assert (written, skipped) == (1, 1)
+    assert "UBERON_2001190" not in out.read_text()

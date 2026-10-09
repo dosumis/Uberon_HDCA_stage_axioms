@@ -12,6 +12,7 @@ from .build import write
 from .model import check, load
 from .contribute import write as write_contribution
 from .scope import read_seed, write_scope_all, write_template
+from .taxon_subset import SUBSET_FOR_TAXON, counts, subset_members
 from .validate import check_table
 
 
@@ -51,12 +52,29 @@ def main(argv: list[str] | None = None) -> int:
     sa.add_argument("ontology", type=Path)
     sa.add_argument("-o", "--out", type=Path, required=True)
     sa.add_argument("--taxon", default="NCBITaxon:9606")
+    sa.add_argument("--uberon-obo", type=Path,
+                    help="full uberon.obo, to read the computed taxon subset from. "
+                         "Without it, scoped classes are generated for terms that "
+                         "cannot exist in the taxon, whose bounds are vacuous.")
 
     args = parser.parse_args(argv)
 
     if args.command == "scope-all":
-        n = write_scope_all(args.ontology, args.out, args.taxon)
-        print(f"wrote {args.out}: {n} scoped classes")
+        restrict = None
+        if args.uberon_obo:
+            subset = SUBSET_FOR_TAXON.get(args.taxon)
+            if not subset:
+                print(f"no taxon subset registered for {args.taxon}", file=sys.stderr)
+                return 1
+            restrict = subset_members(args.uberon_obo, subset)
+            if not restrict:
+                available = sorted(counts(args.uberon_obo))
+                print(f"subset {subset!r} tagged no terms; available: {available}",
+                      file=sys.stderr)
+                return 1
+        n, skipped = write_scope_all(args.ontology, args.out, args.taxon, restrict)
+        note = f"; {skipped} skipped as out of taxon" if skipped else ""
+        print(f"wrote {args.out}: {n} scoped classes{note}")
         return 0
 
     if args.command == "scope":
