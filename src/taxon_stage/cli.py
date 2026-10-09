@@ -11,6 +11,7 @@ from . import __version__
 from .build import write
 from .model import check, load
 from .scope import read_seed, write_template
+from .validate import check_table
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -21,6 +22,11 @@ def main(argv: list[str] | None = None) -> int:
     v = sub.add_parser("check", help="structural validation of the axiom table")
     v.add_argument("table", type=Path)
     v.add_argument("--json", action="store_true")
+
+    o = sub.add_parser("validate", help="online check: do identifiers resolve, "
+                                        "and does each label match its identifier?")
+    o.add_argument("table", type=Path)
+    o.add_argument("--json", action="store_true")
 
     b = sub.add_parser("build", help="generate OWL functional syntax from the table")
     b.add_argument("table", type=Path)
@@ -50,6 +56,20 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  {p}", file=sys.stderr)
             print(f"{len(axioms)} rows, {len(problems)} problems")
         return 1 if problems else 0
+
+    if args.command == "validate":
+        problems = check_table(axioms)
+        real = [p for p in problems if not p["unchecked"]]
+        if args.json:
+            print(json.dumps({"rows": len(axioms), "problems": problems,
+                              "mismatches": len(real)}, indent=2))
+        else:
+            for p in problems:
+                tag = "UNCHECKED " if p["unchecked"] else ""
+                print(f"  {tag}{p['where']}: {p['problem']}", file=sys.stderr)
+                print(f"      FIX: {p['fix']}", file=sys.stderr)
+            print(f"{len(axioms)} rows, {len(real)} label/identifier mismatches")
+        return 1 if real else 0
 
     write(axioms, args.out)
     live = sum(1 for a in axioms if a.status != "superseded")

@@ -11,11 +11,18 @@ TABLE  := src/axioms.tsv
 SEED   := src/seed.tsv
 BUILD  := build
 
-.PHONY: all check axioms scoped reasoned test clean
-all: check axioms
+.PHONY: all check validate axioms scoped reasoned test clean
+all: check validate axioms
 
 check:                         ## structural validation of the table
 	$(PY) check $(TABLE)
+
+# Online, and so kept separate from `check`: identifiers are resolved against
+# OLS through OAK and the answers cached, so this is slow once and instant
+# after. A label that disagrees with its identifier is the one error that
+# reads perfectly and corrupts everything built downstream.
+validate:                      ## check every identifier/label pair against the ontology
+	$(PY) validate $(TABLE)
 
 $(BUILD)/axioms.ofn: $(TABLE) src/taxon_stage/build.py
 	$(PY) build $(TABLE) -o $@
