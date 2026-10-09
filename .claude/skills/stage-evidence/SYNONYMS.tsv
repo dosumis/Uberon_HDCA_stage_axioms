@@ -13,6 +13,14 @@
 # occurs, then record it. A speculative synonym that matches nothing is
 # harmless; one that matches the wrong structure is not.
 #
+# Breadth is a real cost, not a free bet. A form that also names a different
+# structure manufactures false disagreements: `mesoblast` for lateral plate
+# mesoderm matched trophoblastic mesoblastic crests at CS5, `nephrogenic cord`
+# for metanephric mesenchyme matched the CS10 cord that is not yet metanephric,
+# and `optic primordium` for optic cup matched the CS10 optic sulcus. All three
+# were removed after the first run against the axiom table. Prefer a form that
+# can only mean the structure, and accept missing a passage over inventing one.
+#
 # uberon_label<TAB>form|form|form
 
 Mullerian duct	paramesonephric duct
@@ -32,7 +40,7 @@ ganglionic eminence	lateral striatal ridge|medial striatal ridge|striatal field
 gonadal ridge	gonadal ridge|gonadal ridges
 hindlimb bud	lower limb bud|lower limb buds
 indifferent gonad	gonadal primordium|gonadal blastema|gonadal ridge
-lateral plate mesoderm	lateral mesoblastic wings|mesoblast
+lateral plate mesoderm	lateral mesoblastic wings
 lens placode	lens disc|lens discs|lens plate
 lens vesicle	lens vesicle|lens pit
 limb bud	limb bud|limb buds
@@ -42,18 +50,18 @@ mammary ridge	mammary crest
 mandibular prominence	mandibular process|mandibular arch|mandibular bar
 maxillary prominence	maxillary process|maxillary arch|maxillary field
 metanephric cap	metanephrogenic cap|metanephrogenic mantle
-metanephric mesenchyme	metanephrogenic mantle|nephrogenic cord|nephrogenic capsule
+metanephric mesenchyme	metanephrogenic mantle|nephrogenic capsule
 neural tube mantle layer	mantle zone|mantle or intermediate
 neural tube marginal layer	marginal layer|marginal zone
 neural tube ventricular layer	ependymal
 olfactory pit	nasal pit|nasal pits
 olfactory placode	nasal disc|nasal discs|nasal plate|nasal area
-optic cup	optic cup|optic primordium
+optic cup	optic cup
 optic vesicle	optic vesicle|optic primordium
 otic placode	otic disc
 otic pit	otic pit|otic invagination
 pancreas dorsal primordium	dorsal pancreas|dorsal pancreatic duct
-pancreas primordium	pancreas|pancreatic
+pancreas primordium	pancreatic duct|dorsal pancreas|ventral pancreas
 pancreas ventral primordium	ventral pancreas|ventral pancreatic duct
 pharyngeal arch	pharyngeal arch|pharyngeal arches|visceral arch
 pharyngeal arch 1	pharyngeal arch 1|mandibular arch|first pharyngeal arch
@@ -75,7 +83,7 @@ pharyngeal pouch 3	pharyngeal pouch 3
 pharyngeal pouch 4	pharyngeal pouch 4
 posterior neural tube	caudal neural tube|caudal eminence|caudal bud
 proctodeum	anal membrane|anal pit
-pronephric mesoderm	nephrogenic cord|pronephros
+pronephric mesoderm	nephrogenic cord
 sclerotome	sclerotome|sclerotomes
 septum transversum	septum transversum
 thymus primordium	thymic primordium
