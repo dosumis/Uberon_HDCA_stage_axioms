@@ -80,7 +80,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "contribute":
-        info = write_contribution(axioms, args.out, sourced_only=not args.all)
+        info = write_contribution(axioms, args.out, sourced_only=not args.all,
+                                  evidence_dir=args.table.parent / "evidence")
         print(f"wrote {args.out}: {info['axioms']} axioms over {info['structures']} "
               f"structures; {info['withheld']} withheld as unsourced")
         return 0

@@ -81,7 +81,7 @@ Declaration(ObjectProperty(RO:0002497))
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS16 'the primordium of the paramesonephric duct is beginning to appear as an invagination of thickened coelomic epithelium over the mesonephros'")
+    Annotation(rdfs:comment "[Carnegie stage 16, start] The primordium of the paramesonephric duct is beginning to appear as an invagination of thickened coelomic epithelium over the mesonephros.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -93,7 +93,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "appears within the epiblast at CS5 | checked against the source; see src/evidence/ for the quoted passage(s) at CS05. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 05, start] Additional features of stage 5 include the definite appearance of the amniotic cavity and the formation of extra-embryonic mesoblast.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -105,7 +105,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS13 summary 'septum primum and foramen primum appear in the heart'; CS12 says they 'may appear'")
+    Annotation(rdfs:comment "[Carnegie stage 13, start] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -117,7 +117,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS18 summary 'septum secundum and the associated foramen ovale are appearing'; not mentioned before CS18")
+    Annotation(rdfs:comment "[Carnegie stage 18, start] Internal: in the heart, septum secundum and the associated foramen ovale are appearing; the membranous part of the interventricular septum is beginning to take form; the vomeronasal organ is represented by a groove; choanae develop; some subsegmental buds develop in the bronchial tree; collecting tubules develop from the calices; testicular cords may begin to appear in the male gonad; the paramesonephric duct grows rapidly down through the mesonephros; 1-3 semicircular ducts are present in the internal ear.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -129,7 +129,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "paired cerebellar plates form from the rhombic lip at CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS17. Verdict: OPEN")
+    Annotation(rdfs:comment "[Carnegie stage 17, present] The cerebellar plate (innerer Kleinhirnwulst of Hochsetter) is present as a clear thickening.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -141,7 +141,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS17 'a general view of the mesenchymal skeleton at stage 17 shows also the beginning chondrocranium'")
+    Annotation(rdfs:comment "[Carnegie stage 17, start] The cerebellar plate (innerer Kleinhirnwulst of Hochsetter) is present as a clear thickening.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -153,7 +153,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "primary villi form at CS6 (~day 13); secondary and tertiary villi follow over CS7-9 | checked against the source; see src/evidence/ for the quoted passage(s) at CS05. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 05, absent] Characteristic features: implanted but previllous; solid trophoblast in 5a; trophoblastic lacunae, cytotrophoblastic clumps, and primary umbilical vesicle in 5b; lacunar vascular circle and some mesoblastic crests in cytotrophoblastic clumps in 5c")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -165,7 +165,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS18 summary, same sentence as septum secundum")
+    Annotation(rdfs:comment "[Carnegie stage 18, start] Internal: in the heart, septum secundum and the associated foramen ovale are appearing; the membranous part of the interventricular septum is beginning to take form; the vomeronasal organ is represented by a groove; choanae develop; some subsegmental buds develop in the bronchial tree; collecting tubules develop from the calices; testicular cords may begin to appear in the male gonad; the paramesonephric duct grows rapidly down through the mesonephros; 1-3 semicircular ducts are present in the internal ear.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -177,7 +177,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "the opening left between septum primum and septum secundum once atrial septation is complete at CS16; closes functionally at birth when left atrial pressure rises, leaving the fossa ovalis | checked against the source; see src/evidence/ for the quoted passage(s) at CS18. Verdict: SHIFT")
+    Annotation(rdfs:comment "[Carnegie stage 18, start] Internal: in the heart, septum secundum and the associated foramen ovale are appearing; the membranous part of the interventricular septum is beginning to take form; the vomeronasal organ is represented by a groove; choanae develop; some subsegmental buds develop in the bronchial tree; collecting tubules develop from the calices; testicular cords may begin to appear in the male gonad; the paramesonephric duct grows rapidly down through the mesonephros; 1-3 semicircular ducts are present in the internal ear.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -189,7 +189,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS9 'the hindgut is making its appearance as a separate' region; specimen-dependent")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] The stomodeum is beginning to form.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -201,7 +201,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "lower limb bud appears at CS13, one stage after the forelimb | checked against the source; see src/evidence/ for the quoted passage(s) at CS13. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 13, start] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -213,7 +213,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "foot plate and digital rays by CS19 | checked against the source; see src/evidence/ for the quoted passage(s) at CS13. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 13, start] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -225,7 +225,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "segregates between paraxial and lateral plate mesoderm at CS9; gives the urogenital ridges and is no longer distinguishable by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS09. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] The stomodeum is beginning to form.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -237,7 +237,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; segregates between paraxial and lateral plate mesoderm at CS9; gives the urogenital ridges and is no longer distinguishable by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS09. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] The stomodeum is beginning to form.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -249,7 +249,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "thickens over the optic vesicle at CS12 and invaginates by CS13 | checked against the source; see src/evidence/ for the quoted passage(s) at CS13. Verdict: OPEN")
+    Annotation(rdfs:comment "[Carnegie stage 13, present] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -261,7 +261,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; thickens over the optic vesicle at CS12 and invaginates by CS13 | checked against the source; see src/evidence/ for the quoted passage(s) at CS13. Verdict: OPEN")
+    Annotation(rdfs:comment "[Carnegie stage 13, present] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -273,7 +273,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "respiratory diverticulum evaginates from the foregut at CS12 (~4 weeks) | checked against the source; see src/evidence/ for the quoted passage(s) at CS12. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 12, start] Internal: the interventricular septum has begun; the cystic primordium and the dorsal pancreas are becoming distinguishable; the lung bud appears.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -285,7 +285,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "present with the first arch at CS10; the paired prominences fuse in the midline by CS19 | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -297,7 +297,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; present with the first arch at CS10; the paired prominences fuse in the midline by CS19 | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -309,7 +309,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "mesonephric duct and nephric vesicles appear from CS11. NOT functional at CS11: the source puts urine production at CS17 ('epithelial plaques in the visceral layer of the glomerular capsule and hence can produce urine')")
+    Annotation(rdfs:comment "[Carnegie stage 17, present] The mesonephros shows epithelial plaques in the visceral layer of the glomerular capsule and hence can produce urine (Silverman, 1969).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -321,7 +321,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; functional from CS11; regresses from CS20 as the metanephros takes over | checked against the source; see src/evidence/ for the quoted passage(s) at CS17. Verdict: CONTRADICTED")
+    Annotation(rdfs:comment "[Carnegie stage 17, present] The mesonephros shows epithelial plaques in the visceral layer of the glomerular capsule and hence can produce urine (Silverman, 1969).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -333,7 +333,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "ureteric bud contacts metanephric mesenchyme at CS14 (~5 weeks) | checked against the source; see src/evidence/ for the quoted passage(s) at CS16. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 16, present] The metanephros, which is now reniform, is still sacral in level.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -345,7 +345,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS8 'Nos. 5960 and 7545 already show a neural groove'")
+    Annotation(rdfs:comment "[Carnegie stage 08, start] The most advanced embryos with regard to endodermal spread are also more advanced in other respects. (Nos. 5960 and 7545 already show a neural groove.) It may be that this endoderm is derived from the caudal part of the primitive streak (fig. 6-2).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -357,7 +357,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; the plate invaginates to a groove at CS9 | checked against the source; see src/evidence/ for the quoted passage(s) at CS08. Verdict: SHIFT")
+    Annotation(rdfs:comment "[Carnegie stage 08, start] The most advanced embryos with regard to endodermal spread are also more advanced in other respects. (Nos. 5960 and 7545 already show a neural groove.) It may be that this endoderm is derived from the caudal part of the primitive streak (fig. 6-2).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -369,7 +369,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "fusion of the neural folds begins at CS10; the anterior neuropore closes at CS11 and the posterior at CS12 | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -381,7 +381,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS13 'a beginning mantle zone in the region that is to form the ventral' horn")
+    Annotation(rdfs:comment "[Carnegie stage 13, start] The remaining wall is made up of the undifferentiated ependymal zone, except for a beginning mantle zone in the region that is to form the ventral horn of gray matter.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -393,7 +393,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS12 'in most embryos a marginal layer begins to develop'")
+    Annotation(rdfs:comment "[Carnegie stage 12, start] Neurofibrils begin to form for the first time in the rhombencephalic wall, and in most embryos a marginal layer begins to develop.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -405,7 +405,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS11 'one cannot yet mark off ependymal and mantle' zones; CS13 names 'the undifferentiated ependymal zone'")
+    Annotation(rdfs:comment "[Carnegie stage 13, start] The remaining wall is made up of the undifferentiated ependymal zone, except for a beginning mantle zone in the region that is to form the ventral horn of gray matter.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -417,7 +417,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "the notochordal process intercalates into the endoderm at CS8-9 | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: SHIFT")
+    Annotation(rdfs:comment "[Carnegie stage 10, present] Although frequently referred to as the notochord, the axial cells caudal to the prechordal plate are still merely notochordal plate at this stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -429,7 +429,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS10 'still merely notochordal plate at this stage'; still described at CS11")
+    Annotation(rdfs:comment "[Carnegie stage 10, present] Although frequently referred to as the notochord, the axial cells caudal to the prechordal plate are still merely notochordal plate at this stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -441,7 +441,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS15 summary 'nasal pits are appearing'")
+    Annotation(rdfs:comment "[Carnegie stage 15, start] External: lens vesicles are closed; nasal pits are appearing; hand plates are forming.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -453,7 +453,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; the placode invaginates to a pit at CS14 | checked against the source; see src/evidence/ for the quoted passage(s) at CS15. Verdict: SHIFT")
+    Annotation(rdfs:comment "[Carnegie stage 15, start] External: lens vesicles are closed; nasal pits are appearing; hand plates are forming.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -465,7 +465,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS12 'the nasal discs become thicker and form a portion of the ectodermal ring'; O'Rahilly avoids 'placode' and writes nasal disc/plate")
+    Annotation(rdfs:comment "[Carnegie stage 12, start] The nasal discs become thicker and form a portion of the ectodermal ring on both sides of the closed neuropore (O'Rahilly and Müller, 1985).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -477,7 +477,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; nasal placodes thicken on the frontonasal prominence at CS13 | checked against the source; see src/evidence/ for the quoted passage(s) at CS12. Verdict: SHIFT")
+    Annotation(rdfs:comment "[Carnegie stage 12, start] The nasal discs become thicker and form a portion of the ectodermal ring on both sides of the closed neuropore (O'Rahilly and Müller, 1985).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -489,7 +489,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "optic cup forms by invagination of the optic vesicle at CS13 | checked against the source; see src/evidence/ for the quoted passage(s) at CS13. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 13, start] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -501,7 +501,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "optic vesicles evaginate from the forebrain at CS11 | checked against the source; see src/evidence/ for the quoted passage(s) at CS11. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 11, start] Internal: the sinus venosus develops; the oropharyngeal membrane ruptures; the mesonephric duct and nephric tubules appear; the optic vesicle and otic pit develop.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -513,7 +513,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "the vesicle invaginates to form the optic cup at CS13 | checked against the source; see src/evidence/ for the quoted passage(s) at CS11. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 11, start] Internal: the sinus venosus develops; the oropharyngeal membrane ruptures; the mesonephric duct and nephric tubules appear; the optic vesicle and otic pit develop.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -525,7 +525,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "thickens beside the hindbrain at CS9 and invaginates by CS11 | checked against the source; see src/evidence/ for the quoted passage(s) at CS09. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] The otic disc (or plate) makes its appearance during stage 9 (fig. 9-6).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -537,7 +537,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; thickens beside the hindbrain at CS9 and invaginates by CS11 | checked against the source; see src/evidence/ for the quoted passage(s) at CS09. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] The otic disc (or plate) makes its appearance during stage 9 (fig. 9-6).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -549,7 +549,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "appears at CS12 | checked against the source; see src/evidence/ for the quoted passage(s) at CS12. Verdict: CONTRADICTED")
+    Annotation(rdfs:comment "[Carnegie stage 12, absent] Internal: the interventricular septum has begun; the cystic primordium and the dorsal pancreas are becoming distinguishable; the lung bud appears.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -561,7 +561,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; appears at CS12 | checked against the source; see src/evidence/ for the quoted passage(s) at CS12. Verdict: CONTRADICTED")
+    Annotation(rdfs:comment "[Carnegie stage 12, absent] Internal: the interventricular septum has begun; the cystic primordium and the dorsal pancreas are becoming distinguishable; the lung bud appears.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -573,7 +573,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "second pouch at CS10; gives the palatine tonsil crypts | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -585,7 +585,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "appears at the caudal epiblast at CS6 (~day 15) and regresses as the notochordal process extends | checked against the source; see src/evidence/ for the quoted passage(s) at CS06, CS11. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 06, start] In the human, the primitive streak appears first during stage 6.  [Carnegie stage 11, absent] The caudal eminence, which lies between the cloacal membrane and the site of the neurenteric canal, represents the region of the former primitive streak.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -597,7 +597,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; appears at the caudal epiblast at CS6 (~day 15) and regresses as the notochordal process extends | checked against the source; see src/evidence/ for the quoted passage(s) at CS06, CS11. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 06, start] In the human, the primitive streak appears first during stage 6.  [Carnegie stage 11, absent] The caudal eminence, which lies between the cloacal membrane and the site of the neurenteric canal, represents the region of the former primitive streak.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -609,7 +609,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS16 'the alar lamina is developing, and its upper part, the rhombic lip, is very dense'; the only mention")
+    Annotation(rdfs:comment "[Carnegie stage 16, start] The alar lamina is developing, and its upper part, the rhombic lip, is very dense.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -621,7 +621,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "mesodermal plate between the pericardial cavity and the yolk-sac stalk at CS9; incorporated into the diaphragm and liver by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS09. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] Other features that have been identified by stage 9 include the \"cardiac jelly\" (Davis, 1927), the mesocardium, and the septum transversum (Ingalls, 1920).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -633,7 +633,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; mesodermal plate between the pericardial cavity and the yolk-sac stalk at CS9; incorporated into the diaphragm and liver by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS09. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] Other features that have been identified by stage 9 include the \"cardiac jelly\" (Davis, 1927), the mesocardium, and the septum transversum (Ingalls, 1920).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -645,7 +645,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: at CS10 'a sinus venosus as such is not present until the next stage'; the CS11 summary lists the sinus venosus developing")
+    Annotation(rdfs:comment "[Carnegie stage 10, absent] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -657,7 +657,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; present from CS10; absorbed into the right atrium by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: CONTRADICTED")
+    Annotation(rdfs:comment "[Carnegie stage 10, absent] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -669,7 +669,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "interval")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "the first pair forms at CS9 (~day 20) and 42-44 pairs accumulate in sequence by CS20; strictly serial, so no point onset | checked against the source; see src/evidence/ for the quoted passage(s) at CS08. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 08, absent] The embryo is presomitic, i.e., somites are not yet visible.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -681,7 +681,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "interval")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; the first pair forms at CS9 (~day 20) and 42-44 pairs accumulate in sequence by CS20; strictly serial, so no point onset | checked against the source; see src/evidence/ for the quoted passage(s) at CS08. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 08, absent] The embryo is presomitic, i.e., somites are not yet visible.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -693,7 +693,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS9 'The stomodeum is beginning to form'")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] The stomodeum is beginning to form.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -705,7 +705,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; ectodermal depression at CS10; the buccopharyngeal membrane breaks down at CS11-12 | checked against the source; see src/evidence/ for the quoted passage(s) at CS09. Verdict: SHIFT")
+    Annotation(rdfs:comment "[Carnegie stage 09, start] The stomodeum is beginning to form.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -717,7 +717,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "third pharyngeal pouch endoderm forms the thymic primordium at CS13-14 | checked against the source; see src/evidence/ for the quoted passage(s) at CS13. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 13, start] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -729,7 +729,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "evaginates from the floor of the pharynx at CS10 and descends to its final position by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -741,7 +741,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; evaginates from the floor of the pharynx at CS10 and descends to its final position by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS10. Verdict: CONFIRMED")
+    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -753,7 +753,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "source: CS14 summary 'the ureteric bud acquires a metanephrogenic cap'. CS13 is doubly hedged ('may possibly be present', 'further confirmation is needed') and will not support a point onset")
+    Annotation(rdfs:comment "[Carnegie stage 14, start] Internal: the ventral pancreas (if not detectable earlier) is distinguishable at stages 14 and 15; right and left lung sacs grow dorsad; the ureteric bud acquires a metanephrogenic cap; future cerebral hemispheres and cerebellar plates begin to be visible.  [Carnegie stage 13, present] A ureteric bud may possibly be present in some specimens (Wells, 1954, fig. 4), although further confirmation is needed.  [Carnegie stage 18, present] Collecting tubules develop from the calices at stages 17 and 18 (fig. 18-14).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
@@ -765,7 +765,7 @@ SubClassOf(
 SubClassOf(
     Annotation(TSA:onset_type "point")
     Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "see the start bound; evaginates from the mesonephric duct at CS13 and has branched into the collecting system by CS16 | checked against the source; see src/evidence/ for the quoted passage(s) at CS13, CS14, CS18. Verdict: WEAK")
+    Annotation(rdfs:comment "[Carnegie stage 13, present] A ureteric bud may possibly be present in some specimens (Wells, 1954, fig. 4), although further confirmation is needed.  [Carnegie stage 14, start] Internal: the ventral pancreas (if not detectable earlier) is distinguishable at stages 14 and 15; right and left lung sacs grow dorsad; the ureteric bud acquires a metanephrogenic cap; future cerebral hemispheres and cerebellar plates begin to be visible.  [Carnegie stage 18, present] Collecting tubules develop from the calices at stages 17 and 18 (fig. 18-14).")
     Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
     Annotation(dcterms:contributor "agent:stage-evidence")
     Annotation(dcterms:date "2026-10-10")
