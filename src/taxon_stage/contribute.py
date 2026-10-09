@@ -41,7 +41,8 @@ def review_table(axioms: list[Axiom], path: Path) -> None:
 def write(axioms: list[Axiom], out_dir: Path, sourced_only: bool = True) -> dict:
     chosen = selected(axioms, sourced_only)
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "uberon-human-stage-gcis.ofn").write_text(render(chosen))
+    (out_dir / "uberon-human-stage-gcis.ofn").write_text(
+        render(chosen, for_contribution=True))
     review_table(chosen, out_dir / "review.tsv")
     return {
         "axioms": len(chosen),

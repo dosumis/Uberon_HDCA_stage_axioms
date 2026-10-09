@@ -53,9 +53,14 @@ def _quote(text: str) -> str:
     return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def _annotations(a: Axiom) -> list[str]:
-    out = [f"Annotation(TSA:onset_type {_quote(a.onset_type)})",
-           f"Annotation({EXPAND} \"true\"^^xsd:boolean)"]
+def _annotations(a: Axiom, for_contribution: bool = False) -> list[str]:
+    # onset_type records the curator's judgement and is what justifies the
+    # choice of predicate, so it travels with the axiom. expand_for_reasoning
+    # is a hint to our own macro and has no business in someone else's
+    # ontology, so the contribution drops it.
+    out = [f"Annotation(TSA:onset_type {_quote(a.onset_type)})"]
+    if not for_contribution:
+        out.append(f"Annotation({EXPAND} \"true\"^^xsd:boolean)")
     if a.evidence_code:
         out.append(f"Annotation(RO:0002558 {a.evidence_code})")
     if a.evidence_text:
@@ -69,18 +74,18 @@ def _annotations(a: Axiom) -> list[str]:
     return out
 
 
-def gci(a: Axiom) -> str:
+def gci(a: Axiom, for_contribution: bool = False) -> str:
     """One GCI, with its evidence carried as axiom annotations."""
     lhs = (
         f"ObjectIntersectionOf({a.uberon_id} "
         f"ObjectSomeValuesFrom({IN_TAXON} {a.taxon_id}))"
     )
     rhs = f"ObjectSomeValuesFrom({a.predicate} {a.stage_id})"
-    anns = "\n    ".join(_annotations(a))
+    anns = "\n    ".join(_annotations(a, for_contribution))
     return f"SubClassOf(\n    {anns}\n    {lhs}\n    {rhs}\n)"
 
 
-def render(axioms: list[Axiom]) -> str:
+def render(axioms: list[Axiom], for_contribution: bool = False) -> str:
     live = [a for a in axioms if a.status != "superseded"]
     lines = [f"Prefix({p}:=<{iri}>)" for p, iri in PREFIXES.items()]
     lines.append("")
@@ -106,7 +111,7 @@ def render(axioms: list[Axiom]) -> str:
     for a in live:
         label = PREDICATES[a.predicate][0]
         lines.append(f"# {a.uberon_label} {label} {a.stage_label} [{a.taxon_label}]")
-        lines.append(gci(a))
+        lines.append(gci(a, for_contribution))
         lines.append("")
 
     lines.append(")")
