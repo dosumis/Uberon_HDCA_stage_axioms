@@ -10,7 +10,8 @@ from pathlib import Path
 from . import __version__
 from .build import write
 from .model import check, load
-from .scope import read_seed, write_template
+from .contribute import write as write_contribution
+from .scope import read_seed, write_scope_all, write_template
 from .validate import check_table
 
 
@@ -38,7 +39,25 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--taxon", default="NCBITaxon:9606")
     s.add_argument("--taxon-label", default="Homo sapiens")
 
+    c = sub.add_parser("contribute", help="package the axioms for submission to Uberon")
+    c.add_argument("table", type=Path)
+    c.add_argument("-o", "--out", type=Path, required=True, help="output directory")
+    c.add_argument("--all", action="store_true",
+                   help="include unsourced claims; off by default, because an "
+                        "unsourced claim is a to-do rather than a proposal")
+
+    sa = sub.add_parser("scope-all",
+                        help="scoped classes for every Uberon class in an ontology file")
+    sa.add_argument("ontology", type=Path)
+    sa.add_argument("-o", "--out", type=Path, required=True)
+    sa.add_argument("--taxon", default="NCBITaxon:9606")
+
     args = parser.parse_args(argv)
+
+    if args.command == "scope-all":
+        n = write_scope_all(args.ontology, args.out, args.taxon)
+        print(f"wrote {args.out}: {n} scoped classes")
+        return 0
 
     if args.command == "scope":
         n = write_template(read_seed(args.seed), args.taxon, args.taxon_label, args.out)
@@ -46,6 +65,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     axioms = load(args.table)
+
+    if args.command == "contribute":
+        info = write_contribution(axioms, args.out, sourced_only=not args.all)
+        print(f"wrote {args.out}: {info['axioms']} axioms over {info['structures']} "
+              f"structures; {info['withheld']} withheld as unsourced")
+        return 0
 
     if args.command == "check":
         problems = check(axioms)

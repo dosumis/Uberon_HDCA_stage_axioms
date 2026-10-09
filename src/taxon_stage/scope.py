@@ -18,6 +18,7 @@ Uberon by reflex.
 from __future__ import annotations
 
 import csv
+import re
 from pathlib import Path
 
 SCOPED_BASE = "https://w3id.org/taxon-stage-axioms/scoped/"
@@ -26,6 +27,7 @@ SCOPED_BASE = "https://w3id.org/taxon-stage-axioms/scoped/"
 # error. So the seed must carry labels, and the ontology the template is applied
 # to must declare them for the structure, the property and the taxon.
 IN_TAXON_LABEL = "in taxon"
+IN_TAXON = "RO:0002162"
 
 # ROBOT template directives. Row 2 of the file, read as column instructions.
 TEMPLATE_HEADER = ["ID", "LABEL", "TYPE", "EQ"]
@@ -73,3 +75,58 @@ def read_seed(path: Path) -> list[tuple[str, str]]:
             if curie:
                 out.append((curie, (row.get("uberon_label") or "").strip()))
     return out
+
+
+# --- scope-all: every class in an ontology, in functional syntax -------------
+#
+# The ROBOT template route above resolves Manchester cells by label, which means
+# the seed must carry labels and the target ontology must declare them. That is
+# fine for a hand-picked seed and useless at Uberon scale. Emitting functional
+# syntax directly sidesteps label resolution entirely -- CURIEs work, and 16432
+# classes generate in under a second.
+
+FUNCTIONAL_PREFIXES = {
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "UBERON": "http://purl.obolibrary.org/obo/UBERON_",
+    "NCBITaxon": "http://purl.obolibrary.org/obo/NCBITaxon_",
+    "RO": "http://purl.obolibrary.org/obo/RO_",
+    "TSA": SCOPED_BASE,
+}
+
+CLASS_IRI = re.compile(r'rdf:about="http://purl\.obolibrary\.org/obo/(UBERON_\d+)"')
+
+
+def uberon_classes(ontology_path: Path) -> list[str]:
+    """Every UBERON class IRI mentioned as a subject in the file.
+
+    Deliberately a regex over the serialisation rather than an OWL parse: this
+    runs on a 55MB file and only needs the identifiers.
+    """
+    text = ontology_path.read_text(errors="replace")
+    return sorted(set(CLASS_IRI.findall(text)))
+
+
+def render_scope_all(local_ids: list[str], taxon: str) -> str:
+    taxon_local = taxon.replace(":", "_")
+    lines = [f"Prefix({k}:=<{v}>)" for k, v in FUNCTIONAL_PREFIXES.items()]
+    lines += ["", "Ontology(<https://w3id.org/taxon-stage-axioms/scope-all.ofn>",
+              f"Declaration(Class({taxon}))",
+              f"Declaration(ObjectProperty({IN_TAXON}))"]
+    for local in local_ids:
+        gen = f"TSA:{local}-{taxon_local}"
+        lines.append(f"Declaration(Class({gen}))")
+        lines.append(
+            f"EquivalentClasses({gen} ObjectIntersectionOf("
+            f"UBERON:{local.split('_')[1]} "
+            f"ObjectSomeValuesFrom({IN_TAXON} {taxon})))"
+        )
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def write_scope_all(ontology_path: Path, out: Path, taxon: str) -> int:
+    ids = uberon_classes(ontology_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render_scope_all(ids, taxon))
+    return len(ids)

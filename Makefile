@@ -53,6 +53,33 @@ reasoned: scoped
 	$(ROBOT) merge --input $(UBERON) --input $(BUILD)/scoped.ofn --input $(BUILD)/axioms.ofn \
 	  reason --reasoner ELK --axiom-generators "SubClass" --output $(BUILD)/reasoned.ofn
 
+# The standalone round trip: no Uberon, no extra tools, runs per commit.
+# Proves the table survives OWL generation, expansion and materialisation.
+$(BUILD)/extracted.csv: $(BUILD)/expanded.ttl sparql/extract.rq
+	$(ROBOT) materialize --input $(BUILD)/expanded.ttl --reasoner ELK --output $(BUILD)/materialized.ofn
+	$(ROBOT) query --input $(BUILD)/materialized.ofn --query sparql/extract.rq $@
+
+materialize: $(BUILD)/extracted.csv  ## round trip without Uberon (ROBOT only)
+	@echo "extracted $$(( $$(wc -l < $(BUILD)/extracted.csv) - 1 )) rows"
+
+# The real run. Needs UBERON=path/to/uberon-base.owl and relation-graph on PATH.
+# ROBOT's materialize gives the non-redundant form only; relation-graph gives
+# the closure, and is what Ubergraph itself uses -- so local numbers and
+# Ubergraph numbers are comparable rather than merely similar.
+$(BUILD)/rg-out.tsv: $(BUILD)/axioms.ofn
+	@test -n "$(UBERON)" || (echo "set UBERON=path/to/uberon-base.owl" && exit 1)
+	$(PY) scope-all $(UBERON) -o $(BUILD)/scope-all.ofn --taxon "$(TAXON)"
+	$(ROBOT) merge --input $(UBERON) --input $(BUILD)/scope-all.ofn \
+	  --input $(BUILD)/axioms.ofn --output $(BUILD)/merged-full.owl
+	relation-graph --ontology-file $(BUILD)/merged-full.owl --output-file $@ \
+	  --mode TSV --properties-file sparql/existence-properties.txt --obo-prefixes true
+
+reach: $(BUILD)/rg-out.tsv     ## how many Uberon terms the axioms actually reach
+	PYTHONPATH=src uv run --no-project python -m taxon_stage.reach $(BUILD)/rg-out.tsv $(TABLE)
+
+contribute:                    ## package sourced axioms for submission to Uberon
+	$(PY) contribute $(TABLE) -o contribution
+
 test:
 	PYTHONPATH=src uv run --no-project --with pytest pytest -q tests
 
