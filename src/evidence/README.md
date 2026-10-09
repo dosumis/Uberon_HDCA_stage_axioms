@@ -95,6 +95,32 @@ resting on a hedge is not thereby wrong, and converting them to
 says three arches are "the usual final complement **seen externally**", which
 is about visibility, not existence. The OPEN rows stay as they are.
 
+## Why 116 rows still say `latent`
+
+Because `latent` means something specific and those rows have not earned the
+alternative. The schema defines it as a claim seeded from background knowledge
+and not checked by a person -- "a to-do, not a provenance" -- and `model.py`
+treats a row as sourced only when it has both a `source` and a non-latent
+`curator`.
+
+60 rows now carry provenance: every row whose structure has a hand-reviewed,
+quote-backed record in this directory. The other 116 were read, and the reading
+is recorded in `evidence_text` (` | checked 2026-10-10 vs ORahilly1987: ...`),
+but they keep `curator: latent` because no reviewed quote stands behind them.
+
+The split is not laziness, it is a limit worth stating. 36 of those rows have
+**no sentence at the claimed stage at all** -- which is why they were graded
+WEAK; their support is a neighbouring stage or an inference. For the other 37 a
+candidate sentence exists, and auto-filling them was tried and rejected: the
+best-scoring sentence at CS7 for both `allantois` and `cloacal membrane` is
+about the **chick** embryo, and the one for `amnion` at CS5 is a general
+discussion of how amnions form rather than evidence that one is present.
+
+That is the ceiling of what the Write/Edit hook can promise. It proves a quote
+is verbatim and comes from the stage it is filed under. It cannot prove the
+quote *supports the claim*, and machine-selected quotes fail exactly there.
+Those 37 rows need a person to choose the sentence.
+
 ## What was actually established
 
 ### Contradicted outright
