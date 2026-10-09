@@ -70,6 +70,31 @@ disagreements — `mesoblast`, `nephrogenic cord` for metanephric mesenchyme,
 `optic primordium` for optic cup, and two others. Coverage stayed at 96/114
 labels, so they were contributing noise and nothing else.
 
+## What was applied to the table
+
+20 rows were edited (commit following this README). Every edited row carries a
+quote-backed record in this directory, `evidence_code: ECO:0000304`, the
+citation in `source`, and `curator: agent:stage-evidence` -- which is NOT a
+claim that a person has checked it. `status` stays `proposed`: the schema
+reserves `accepted` for a curator's review, and an agent reading a source is
+not that.
+
+Two rows superseded: both `pronephros` bounds. 17 stage corrections: ureteric
+bud CS13→14, sinus venosus CS10→11, septum primum CS14→13, septum secundum and
+foramen ovale CS16→18, rhombic lip CS14→16, chondrocranium CS16→17, stomodeum
+CS10→9, hindgut CS10→9, neural groove CS9→8, notochordal plate end CS9→11,
+Mullerian duct CS15→16, olfactory placode CS13→12, olfactory pit CS14→15, and
+the three neural-tube layers (marginal CS15→12, mantle CS14→13, ventricular
+CS12→13). One evidence_text corrected: mesonephros, which claimed function five
+stages before the source allows it.
+
+**Not applied, deliberately.** The 22 WEAK rows keep their stages: a claim
+resting on a hedge is not thereby wrong, and converting them to
+`RO:0002496`/`interval` is a modelling decision for a curator, not a correction.
+`pharyngeal arch 4` was initially read as contradicted and is not -- the source
+says three arches are "the usual final complement **seen externally**", which
+is about visibility, not existence. The OPEN rows stay as they are.
+
 ## What was actually established
 
 ### Contradicted outright
