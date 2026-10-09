@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from taxon_stage.build import gci, render
 from taxon_stage.model import Axiom, check, load
-from taxon_stage.scope import rows, scoped_iri
+from taxon_stage.scope import render as render_scope, scoped_iri, select
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -84,60 +84,30 @@ def test_scoped_iri_is_deterministic_and_reversible():
     assert scoped_iri("UBERON:0004023", "NCBITaxon:9606") == iri
 
 
-def test_scope_template_uses_labels_not_curies():
-    # ROBOT template resolves Manchester cells by label; CURIEs are a parse error.
-    (row,) = rows([("UBERON:0004023", "ganglionic eminence")], "NCBITaxon:9606", "Homo sapiens")
-    assert row[3] == "'ganglionic eminence' and ('in taxon' some 'Homo sapiens')"
+def test_scoped_iri_matches_the_sparql_macro():
+    """expand.ru builds this IRI in SPARQL and scope.py in Python. If they
+    drift, the merge makes two classes for one thing and inheritance stops --
+    silently, because nothing errors and the reach number just drops."""
+    macro = Path(__file__).resolve().parents[1] / "sparql" / "expand.ru"
+    assert "https://w3id.org/taxon-stage-axioms/scoped/" in macro.read_text()
+    assert scoped_iri("UBERON:0004023", "NCBITaxon:9606") == (
+        "https://w3id.org/taxon-stage-axioms/scoped/UBERON_0004023-NCBITaxon_9606")
 
 
-def test_scope_rejects_a_seed_row_with_no_label():
-    with pytest.raises(ValueError, match="label is required"):
-        list(rows([("UBERON:0004023", "")], "NCBITaxon:9606", "Homo sapiens"))
+def test_select_drops_terms_outside_the_taxon():
+    kept, skipped = select({"UBERON_0000955", "UBERON_2001190"}, {"UBERON_0000955"})
+    assert kept == ["UBERON_0000955"]
+    assert skipped == 1
 
 
-# --- taxon subset filtering -------------------------------------------------
-
-OBO_SAMPLE = """format-version: 1.2
-
-[Term]
-id: UBERON:0000955
-name: brain
-subset: human_subset
-subset: mouse_subset
-
-[Term]
-id: UBERON:2001190
-name: Weberian vertebra
-subset: uberon_slim
-
-[Term]
-id: UBERON:0004347
-name: limb bud
-subset: human_subset
-"""
+def test_select_without_a_taxon_subset_keeps_everything():
+    kept, skipped = select({"UBERON_0000955", "UBERON_2001190"}, None)
+    assert len(kept) == 2 and skipped == 0
 
 
-def test_taxon_subset_members(tmp_path):
-    from taxon_stage.taxon_subset import subset_members
-
-    obo = tmp_path / "u.obo"
-    obo.write_text(OBO_SAMPLE)
-    human = subset_members(obo, "human_subset")
-    assert human == {"UBERON_0000955", "UBERON_0004347"}
-    # the whole point: a fish structure is not tagged for human, so scoping it
-    # would produce an empty class whose inherited bounds are vacuous
-    assert "UBERON_2001190" not in human
-
-
-def test_scope_all_skips_out_of_taxon_terms(tmp_path):
-    from taxon_stage.scope import write_scope_all
-
-    owl = tmp_path / "u.owl"
-    owl.write_text(
-        '<rdf:RDF><owl:Class rdf:about="http://purl.obolibrary.org/obo/UBERON_0000955"/>'
-        '<owl:Class rdf:about="http://purl.obolibrary.org/obo/UBERON_2001190"/></rdf:RDF>'
-    )
-    out = tmp_path / "scope.ofn"
-    written, skipped = write_scope_all(owl, out, "NCBITaxon:9606", {"UBERON_0000955"})
-    assert (written, skipped) == (1, 1)
-    assert "UBERON_2001190" not in out.read_text()
+def test_render_emits_curies_not_labels():
+    # ROBOT templates need labels; functional syntax does not, which is why
+    # this generates thousands of classes in under a second.
+    out = render_scope(["UBERON_0004023"], "NCBITaxon:9606")
+    assert "ObjectIntersectionOf(UBERON:0004023 " in out
+    assert "ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606)" in out

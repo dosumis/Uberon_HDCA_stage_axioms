@@ -1,91 +1,32 @@
-"""Generate taxon-scoped classes for a whole population, not just the annotated ones.
+"""Generate the taxon-scoped classes that make the GCIs materialise.
 
-The expansion macro gives a named class to every structure that *carries* an
-axiom. That is not enough for the inference we actually want: a bound asserted
-on `ganglionic eminence` only reaches `lateral ganglionic eminence` if the
-latter also has a scoped class, because `X-9606 SubClassOf Y-9606` follows from
-`X SubClassOf Y` only when both scoped classes exist.
+A GCI has no named subject, so nothing attaches an edge to it. `expand.ru`
+names the left-hand side of each GCI; this names the same intersection for every
+term that could *inherit* one, because `GEN_hs_Y SubClassOf GEN_hs_X` follows
+from `Y SubClassOf X` only if both scoped classes exist.
 
-So this is a second, scope-driven job rather than an axiom-driven one. It emits
-a ROBOT template, which handles Manchester class expressions natively -- far
-less awkward than constructing RDF lists in a SPARQL update.
+Two filters decide the population, and both matter:
 
-Scale, for reference: 3777 developing structures, 16142 Uberon classes. Both are
-small for ELK, but the seed should be the population you query, not all of
-Uberon by reflex.
+  * `descendants` -- a term not below an axiom subject can never inherit a
+    bound, so scoping it is waste. 310 instead of 13195.
+  * `taxon subset` -- a term that cannot exist in the taxon gives an empty
+    scoped class, whose inherited bounds are vacuously true. `Weberian vertebra
+    and in_taxon some Homo sapiens` is the shape of the problem.
+
+Output is OWL functional syntax rather than a ROBOT template. Templates resolve
+names in Manchester cells by *label*, which means the ontology must declare a
+label for the structure, the property and the taxon; functional syntax takes
+CURIEs and generates 13195 classes in under a second.
 """
 
 from __future__ import annotations
 
-import csv
-import re
 from pathlib import Path
 
 SCOPED_BASE = "https://w3id.org/taxon-stage-axioms/scoped/"
-# ROBOT template resolves names in Manchester cells by LABEL, not CURIE -- a
-# cell of `UBERON:0004023 and (RO:0002162 some NCBITaxon:9606)` is a parse
-# error. So the seed must carry labels, and the ontology the template is applied
-# to must declare them for the structure, the property and the taxon.
-IN_TAXON_LABEL = "in taxon"
 IN_TAXON = "RO:0002162"
 
-# ROBOT template directives. Row 2 of the file, read as column instructions.
-TEMPLATE_HEADER = ["ID", "LABEL", "TYPE", "EQ"]
-TEMPLATE_DIRECTIVES = ["ID", "LABEL", "TYPE", "EC %"]
-
-
-def scoped_iri(curie: str, taxon: str) -> str:
-    return SCOPED_BASE + f"{curie.replace(':', '_')}-{taxon.replace(':', '_')}"
-
-
-def rows(seed: list[tuple[str, str]], taxon: str, taxon_label: str):
-    """seed is (uberon_curie, uberon_label) pairs; the label is required."""
-    for curie, label in seed:
-        if not label:
-            raise ValueError(
-                f"{curie}: a label is required -- ROBOT template resolves Manchester "
-                "cells by label, so a seed row without one cannot be expressed"
-            )
-        yield [
-            scoped_iri(curie, taxon),
-            f"{label} ({taxon_label})" if label else curie,
-            "owl:Class",
-            f"'{label}' and ('{IN_TAXON_LABEL}' some '{taxon_label}')",
-        ]
-
-
-def write_template(seed, taxon: str, taxon_label: str, path: Path) -> int:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    seed = list(seed)
-    with open(path, "w", newline="") as fh:
-        w = csv.writer(fh, delimiter="\t", lineterminator="\n")
-        w.writerow(TEMPLATE_HEADER)
-        w.writerow(TEMPLATE_DIRECTIVES)
-        for row in rows(seed, taxon, taxon_label):
-            w.writerow(row)
-    return len(seed)
-
-
-def read_seed(path: Path) -> list[tuple[str, str]]:
-    """Seed file: TSV of uberon_id and optional uberon_label, header required."""
-    out = []
-    with open(path, newline="") as fh:
-        for row in csv.DictReader(fh, delimiter="\t"):
-            curie = (row.get("uberon_id") or "").strip()
-            if curie:
-                out.append((curie, (row.get("uberon_label") or "").strip()))
-    return out
-
-
-# --- scope-all: every class in an ontology, in functional syntax -------------
-#
-# The ROBOT template route above resolves Manchester cells by label, which means
-# the seed must carry labels and the target ontology must declare them. That is
-# fine for a hand-picked seed and useless at Uberon scale. Emitting functional
-# syntax directly sidesteps label resolution entirely -- CURIEs work, and 16432
-# classes generate in under a second.
-
-FUNCTIONAL_PREFIXES = {
+PREFIXES = {
     "owl": "http://www.w3.org/2002/07/owl#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "UBERON": "http://purl.obolibrary.org/obo/UBERON_",
@@ -94,26 +35,25 @@ FUNCTIONAL_PREFIXES = {
     "TSA": SCOPED_BASE,
 }
 
-CLASS_IRI = re.compile(r'rdf:about="http://purl\.obolibrary\.org/obo/(UBERON_\d+)"')
 
+def scoped_iri(curie: str, taxon: str) -> str:
+    """Deterministic in both inputs, and reversible by splitting on the hyphen.
 
-def uberon_classes(ontology_path: Path) -> list[str]:
-    """Every UBERON class IRI mentioned as a subject in the file.
-
-    Deliberately a regex over the serialisation rather than an OWL parse: this
-    runs on a 55MB file and only needs the identifiers.
+    `expand.ru` builds the same IRI in SPARQL. The two must agree exactly: if
+    they drift, the merge produces two classes for one thing, inheritance stops,
+    and nothing fails -- the reach number just quietly drops. See
+    tests/test_model.py for the pin.
     """
-    text = ontology_path.read_text(errors="replace")
-    return sorted(set(CLASS_IRI.findall(text)))
+    return SCOPED_BASE + f"{curie.replace(':', '_')}-{taxon.replace(':', '_')}"
 
 
-def render_scope_all(local_ids: list[str], taxon: str) -> str:
+def render(local_ids: list[str], taxon: str) -> str:
     taxon_local = taxon.replace(":", "_")
-    lines = [f"Prefix({k}:=<{v}>)" for k, v in FUNCTIONAL_PREFIXES.items()]
-    lines += ["", "Ontology(<https://w3id.org/taxon-stage-axioms/scope-all.ofn>",
+    lines = [f"Prefix({k}:=<{v}>)" for k, v in PREFIXES.items()]
+    lines += ["", "Ontology(<https://w3id.org/taxon-stage-axioms/scoped.ofn>",
               f"Declaration(Class({taxon}))",
               f"Declaration(ObjectProperty({IN_TAXON}))"]
-    for local in local_ids:
+    for local in sorted(local_ids):
         gen = f"TSA:{local}-{taxon_local}"
         lines.append(f"Declaration(Class({gen}))")
         lines.append(
@@ -125,19 +65,17 @@ def render_scope_all(local_ids: list[str], taxon: str) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_scope_all(
-    ontology_path: Path, out: Path, taxon: str, restrict_to: set[str] | None = None
-) -> tuple[int, int]:
-    """Returns (written, skipped).
+def select(descendants: set[str], in_taxon: set[str] | None) -> tuple[list[str], int]:
+    """Returns (kept, skipped_as_out_of_taxon)."""
+    if in_taxon is None:
+        return sorted(descendants), 0
+    kept = sorted(descendants & in_taxon)
+    return kept, len(descendants) - len(kept)
 
-    `restrict_to` should be Uberon's computed taxon subset for this taxon.
-    Without it, scoped classes are generated for terms that cannot exist in the
-    taxon at all -- `Weberian vertebra and in_taxon some Homo sapiens` is an
-    empty class, so any bound it inherits is vacuously true. Harmless logically,
-    noise in the output, and misleading to anyone reading it as a claim.
-    """
-    ids = uberon_classes(ontology_path)
-    kept = [i for i in ids if restrict_to is None or i in restrict_to]
+
+def write(descendants: set[str], in_taxon: set[str] | None, out: Path,
+          taxon: str) -> tuple[int, int]:
+    kept, skipped = select(descendants, in_taxon)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render_scope_all(kept, taxon))
-    return len(kept), len(ids) - len(kept)
+    out.write_text(render(kept, taxon))
+    return len(kept), skipped

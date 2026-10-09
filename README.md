@@ -53,36 +53,79 @@ sub-stages.
 
 ```
 src/axioms.tsv          the only hand-edited file; schema in schema/
-src/seed.tsv            which structures get a taxon-scoped class
-src/taxon_stage/        table -> OWL, table -> ROBOT template, validation
+src/evidence/           quoted passages backing the sourced claims
+src/taxon_stage/        table -> OWL, scoped classes, validation, measurement
 sparql/expand.ru        GCI left-hand side -> named class
-sparql/link-develops-from.ru   carry develops_from into the scoped namespace
 sparql/checks/          monotonicity, unexpanded-GCI
 sparql/extract.rq       materialised bounds back out as a table
+contribution/           what would go to Uberon: sourced GCIs + a review table
 ```
 
 ## Pipeline
 
 ```
-make check      validate the table
-make axioms     table -> build/axioms.ofn   (this is the contribution)
-make scoped     expand GCIs, generate scoped classes for the seed population
-make reasoned   classify with ELK   (UBERON=path/to/uberon.owl)
+make check      structural validation of the table        (offline, instant)
+make validate   identifier/label agreement                (online, cached)
+make axioms     table -> build/axioms.ofn                 (the contribution)
+make scoped     expand GCIs, scope the terms that can inherit
+make materialize round trip with no Uberon                (ROBOT only)
+make reach      the real run                              (needs UBERON=, UBERON_OBO=)
+make contribute package the sourced axioms
 make test
 ```
 
-Materialising the existential edges needs **relation-graph**, which ROBOT's
-`reason` step does not do — it asserts named subsumptions only. `make reasoned`
-proves the classification; producing the edge table is a relation-graph run on
-its output, and `sparql/extract.rq` reads that.
+### Which terms get a scoped class
+
+A GCI has no named subject, so nothing materialises it; `expand.ru` names the
+left-hand side. But a bound on a parent only reaches a child if the child has a
+scoped class too, so the population matters.
+
+It is the **reasoned subClassOf descendants of the axiom subjects**, intersected
+with Uberon's computed taxon subset:
+
+| | classes |
+|---|---:|
+| axiom subjects | 113 |
+| + reasoned descendants | 324 |
+| ∩ `human_subset` | **310** |
+| every Uberon class, for comparison | 16432 |
+
+Both filters earn their place. A term not below an axiom subject can never
+inherit anything — scoping all of Uberon costs 13195 classes to reach the same
+310. A term that cannot exist in the taxon gives an empty scoped class whose
+inherited bounds are vacuously true; `Weberian vertebra and in_taxon some Homo
+sapiens` is the shape of that, and the subset tag removes it along with the fin
+ridges, the ural vertebrae and `forelimb wing bud`.
+
+Verified lossless: scoping all 16432 and scoping the 310 both reach exactly 310
+terms with 462 facts.
+
+There is no bootstrap. `GEN_hs_Y SubClassOf GEN_hs_X` follows from `Y SubClassOf
+X`, which is a fact about Uberon alone — so you ask Uberon for the descendants
+and build exactly those. Take the closure from a **reasoner**, though: the
+asserted `is_a` hierarchy gives 316 and misses eight terms subsumed through
+logical definitions (`pharyngeal arch 7`, `trunk vertebra`, the chorionic villus
+subtypes). Ubergraph's redundant graph already holds it, cached in
+`build/descendants.json` against the subjects it was computed for.
+
+### What the axioms reach
+
+113 asserted structures, **310** Uberon terms carrying an HsapDv bound, **197**
+of them inherited. 462 (term, predicate, stage) facts from 176 asserted rows.
+
+Materialising the existential edges needs **relation-graph** — ROBOT's `reason`
+asserts named subsumptions only. `make materialize` uses `robot materialize` for
+the per-commit round trip, which needs no Uberon and no extra tools;
+`make reach` uses relation-graph, which gives the closure and is what Ubergraph
+itself uses, so local numbers and published numbers are comparable.
 
 ## Two things that cost an afternoon
 
 **ROBOT template resolves Manchester cells by label, not CURIE.** A cell of
-`UBERON:0004023 and (RO:0002162 some NCBITaxon:9606)` is a parse error. The seed
-must carry labels and the target ontology must declare them for the structure,
-the property and the taxon. `scope.py` refuses a seed row with no label rather
-than emitting something that fails later.
+`UBERON:0004023 and (RO:0002162 some NCBITaxon:9606)` is a parse error, so a
+template needs labels declared for the structure, the property *and* the taxon.
+That is why `scope.py` emits OWL functional syntax instead — CURIEs work, and
+there is no dependency on what the target ontology happens to label.
 
 **Reusing the GCI's bnode in the expansion does not survive an OWLAPI round
 trip.** The macro inserts `GEN owl:equivalentClass ?lhs` sharing the existing

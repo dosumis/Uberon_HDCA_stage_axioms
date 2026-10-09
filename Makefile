@@ -8,10 +8,9 @@ TAXON ?= NCBITaxon:9606
 TAXON_LABEL ?= Homo sapiens
 
 TABLE  := src/axioms.tsv
-SEED   := src/seed.tsv
 BUILD  := build
 
-.PHONY: all check validate axioms scoped reasoned test clean
+.PHONY: all check validate axioms scoped materialize reach contribute test clean
 all: check validate axioms
 
 check:                         ## structural validation of the table
@@ -38,20 +37,16 @@ $(BUILD)/expanded.ttl: $(BUILD)/axioms.ofn sparql/expand.ru
 	@test $$(wc -l < $(BUILD)/unexpanded.csv) -le 1 || \
 	  (echo "FAIL: taxon-scoped GCIs did not expand; see $(BUILD)/unexpanded.csv" && exit 1)
 
-# Scope expansion is a second, population-driven job: a bound on a parent only
-# reaches a child if the child also has a scoped class.
-$(BUILD)/scoped.tsv: $(SEED) src/taxon_stage/scope.py
-	$(PY) scope $(SEED) -o $@ --taxon "$(TAXON)" --taxon-label "$(TAXON_LABEL)"
+# Scope expansion is the second, population-driven job: a bound on a parent
+# only reaches a child if the child also has a scoped class. The population is
+# the reasoned subClassOf descendants of the axiom subjects, intersected with
+# Uberon's computed taxon subset -- 310 classes, not 13195. Terms outside that
+# set can never inherit anything, so scoping them is waste.
+$(BUILD)/scoped.ofn: $(TABLE) src/taxon_stage/scope.py src/taxon_stage/descendants.py
+	$(PY) scope $(TABLE) -o $@ --taxon "$(TAXON)" \
+	  $(if $(UBERON_OBO),--uberon-obo $(UBERON_OBO),)
 
-scoped: $(BUILD)/expanded.ttl $(BUILD)/scoped.tsv
-
-# ELK classifies; relation-graph materialises the existentials. ROBOT's reasoner
-# step asserts named subsumptions only -- enough to show inheritance works, not
-# enough to produce the edge table. See README.
-reasoned: scoped
-	$(ROBOT) template --template $(BUILD)/scoped.tsv --input $(UBERON) --output $(BUILD)/scoped.ofn
-	$(ROBOT) merge --input $(UBERON) --input $(BUILD)/scoped.ofn --input $(BUILD)/axioms.ofn \
-	  reason --reasoner ELK --axiom-generators "SubClass" --output $(BUILD)/reasoned.ofn
+scoped: $(BUILD)/expanded.ttl $(BUILD)/scoped.ofn
 
 # The standalone round trip: no Uberon, no extra tools, runs per commit.
 # Proves the table survives OWL generation, expansion and materialisation.
@@ -69,13 +64,15 @@ materialize: $(BUILD)/extracted.csv  ## round trip without Uberon (ROBOT only)
 # UBERON_OBO is the full uberon.obo release, read only for its computed taxon
 # subset tags. They are absent from uberon-base.owl and from Ubergraph, so there
 # is no way to get them from the files the rest of the build uses.
-$(BUILD)/rg-out.tsv: $(BUILD)/axioms.ofn
+#
+# Descendants come from Ubergraph and are cached in build/descendants.json; the
+# cache records which subjects it was computed for, so adding an axiom
+# invalidates it rather than silently returning a too-small set.
+$(BUILD)/rg-out.tsv: $(BUILD)/axioms.ofn $(BUILD)/scoped.ofn
 	@test -n "$(UBERON)" || (echo "set UBERON=path/to/uberon-base.owl" && exit 1)
-	@test -n "$(UBERON_OBO)" || echo "warning: UBERON_OBO unset; scoping every \
-	  Uberon class, including ones that cannot exist in $(TAXON_LABEL)"
-	$(PY) scope-all $(UBERON) -o $(BUILD)/scope-all.ofn --taxon "$(TAXON)" \
-	  $(if $(UBERON_OBO),--uberon-obo $(UBERON_OBO),)
-	$(ROBOT) merge --input $(UBERON) --input $(BUILD)/scope-all.ofn \
+	@test -n "$(UBERON_OBO)" || echo "warning: UBERON_OBO unset; scoping terms \
+	  that cannot exist in $(TAXON_LABEL), whose bounds are vacuous"
+	$(ROBOT) merge --input $(UBERON) --input $(BUILD)/scoped.ofn \
 	  --input $(BUILD)/axioms.ofn --output $(BUILD)/merged-full.owl
 	relation-graph --ontology-file $(BUILD)/merged-full.owl --output-file $@ \
 	  --mode TSV --properties-file sparql/existence-properties.txt --obo-prefixes true
