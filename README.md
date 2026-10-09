@@ -118,5 +118,24 @@ be wrong, so it can be checked.
 
 ## Status
 
-Draft. 24 axioms over 20 structures, all `proposed`, none sourced. The
-infrastructure is exercised end to end; the content is a worked example.
+Draft. **151 axioms over 96 structures**, all `proposed` and none sourced.
+55 structures carry both a start and an end bound, which is what makes a claim
+refutable rather than merely true.
+
+Coverage follows the classic human embryology curriculum, because that is where
+background knowledge is reliable enough to be worth a curator's time checking:
+gastrulation and the extraembryonic membranes, neurulation and the neural tube
+layers, somites, the pharyngeal arches with their pouches and arch arteries,
+cardiac looping and septation, the eye/ear/nose placodes, the facial
+prominences, foregut derivatives, the three kidneys and the genital ducts, the
+limb buds and the apical ectodermal ridge.
+
+132 claims are `point` and 19 `interval`. The interval rows are not hedging:
+somites, pharyngeal arches, arch arteries, neural crest and the generic limb bud
+genuinely appear in sequence, and a point claim about them would be false rather
+than merely imprecise.
+
+What is deliberately absent: anything fetal, anything where the stage turns on a
+detail I could not state without a source, and the whole of post-CS23
+development. The infrastructure is exercised end to end; the content is a
+seeded draft awaiting review.
