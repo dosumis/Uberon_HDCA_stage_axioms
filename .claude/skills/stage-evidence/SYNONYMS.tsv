@@ -38,6 +38,7 @@ forelimb bud	upper limb bud|upper limb buds
 frontonasal prominence	medial nasal process|lateral nasal process|nasal field
 ganglionic eminence	lateral striatal ridge|medial striatal ridge|striatal field
 gonadal ridge	gonadal ridge|gonadal ridges
+heart tube	primary cardiac tube|cardiac tube|endocardial tube
 hindlimb bud	lower limb bud|lower limb buds
 indifferent gonad	gonadal primordium|gonadal blastema|gonadal ridge
 lateral plate mesoderm	lateral mesoblastic wings
@@ -97,8 +98,6 @@ vertebral element	vertebral|centrum|sclerotome
 # unexplored one. Absence here means "this book does not use these words", NOT
 # "this structure does not exist at these stages" -- go to another source.
 #
-#   heart tube          (O'Rahilly describes "the two endocardial tubes" and
-#                        "the endocardial primordium"; no "heart tube")
 #   ductus arteriosus   (post-embryonic emphasis; not named in stages 1-23)
 #   periderm            (not used)
 #   myotome             (dermatome and sclerotome appear; myotome does not)
