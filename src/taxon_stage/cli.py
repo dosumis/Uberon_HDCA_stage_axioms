@@ -82,8 +82,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "contribute":
         info = write_contribution(axioms, args.out, sourced_only=not args.all,
                                   evidence_dir=args.table.parent / "evidence")
-        print(f"wrote {args.out}: {info['axioms']} axioms over {info['structures']} "
-              f"structures; {info['withheld']} withheld as unsourced")
+        print(f"wrote {args.out}: {info['axioms']} axioms over "
+              f"{info['structures']} structures")
+        print(f"  withheld: {info['unsourced']} unsourced, "
+              f"{info['unsupported']} sourced but with no passage bearing on "
+              f"the claim")
         return 0
 
     if args.command == "check":

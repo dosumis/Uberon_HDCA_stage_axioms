@@ -111,3 +111,53 @@ def test_render_emits_curies_not_labels():
     out = render_scope(["UBERON_0004023"], "NCBITaxon:9606")
     assert "ObjectIntersectionOf(UBERON:0004023 " in out
     assert "ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606)" in out
+
+
+# --- does the evidence bear on the claim? -----------------------------------
+
+def _records(tmp_path, *entries):
+    import json
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "e.json").write_text(json.dumps(list(entries)))
+    return tmp_path
+
+
+def test_start_bound_with_a_passage_at_that_stage_is_direct(tmp_path):
+    from taxon_stage.support import DIRECT, classify, load_records
+
+    d = _records(tmp_path, {"uberon_id": "UBERON:0004023", "stage_id": "HsapDv:0000022",
+                            "claim": "start", "quote": "q"})
+    assert classify(axiom(), load_records(d)) == DIRECT
+
+
+def test_start_bound_argued_from_absence_is_contextual(tmp_path):
+    from taxon_stage.support import CONTEXTUAL, classify, load_records
+
+    # absent at an earlier stage bounds the onset without fixing it
+    d = _records(tmp_path, {"uberon_id": "UBERON:0004023", "stage_id": "HsapDv:0000021",
+                            "claim": "absent", "quote": "q"})
+    assert classify(axiom(), load_records(d)) == CONTEXTUAL
+
+
+def test_end_bound_is_unsupported_by_a_start_passage(tmp_path):
+    """The failure this module exists for. A quote about when something appears
+    says nothing about when it goes, and attaching it to an end bound reads as
+    support that is not there."""
+    from taxon_stage.support import NONE, classify, load_records
+
+    d = _records(tmp_path, {"uberon_id": "UBERON:0004023", "stage_id": "HsapDv:0000022",
+                            "claim": "start", "quote": "q"})
+    end = Axiom(**{**axiom().__dict__, "predicate": "RO:0002492", "onset_type": "point"})
+    assert classify(end, load_records(d)) == NONE
+
+
+def test_contribution_withholds_unsupported_claims(tmp_path):
+    from taxon_stage.contribute import write
+
+    d = _records(tmp_path / "ev", {"uberon_id": "UBERON:0004023",
+                                   "stage_id": "HsapDv:0000022",
+                                   "claim": "start", "quote": "q"})
+    supported = axiom(source="PMID:1", curator="real")
+    unsupported = Axiom(**{**supported.__dict__, "predicate": "RO:0002492"})
+    info = write([supported, unsupported], tmp_path / "out", evidence_dir=d)
+    assert info["axioms"] == 1 and info["unsupported"] == 1

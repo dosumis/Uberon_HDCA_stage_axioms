@@ -25,40 +25,31 @@ Declaration(Class(UBERON:0004154))
 Declaration(Class(HsapDv:0000020))
 Declaration(Class(UBERON:0004155))
 Declaration(Class(HsapDv:0000025))
-Declaration(Class(UBERON:0004008))
 Declaration(Class(UBERON:0002241))
 Declaration(Class(HsapDv:0000024))
 Declaration(Class(UBERON:0007106))
 Declaration(Class(HsapDv:0000011))
 Declaration(Class(UBERON:0004754))
-Declaration(Class(HsapDv:0000075))
 Declaration(Class(UBERON:0001046))
 Declaration(Class(HsapDv:0000016))
 Declaration(Class(UBERON:0005418))
-Declaration(Class(HsapDv:0000026))
 Declaration(Class(UBERON:0003064))
-Declaration(Class(UBERON:0003073))
-Declaration(Class(HsapDv:0000019))
 Declaration(Class(UBERON:0000118))
+Declaration(Class(HsapDv:0000019))
 Declaration(Class(UBERON:0005867))
 Declaration(Class(HsapDv:0000017))
-Declaration(Class(UBERON:0000080))
-Declaration(Class(HsapDv:0000018))
-Declaration(Class(HsapDv:0000027))
-Declaration(Class(UBERON:0000081))
-Declaration(Class(HsapDv:0000021))
 Declaration(Class(UBERON:0005061))
 Declaration(Class(HsapDv:0000014))
 Declaration(Class(UBERON:0001049))
 Declaration(Class(UBERON:0004061))
 Declaration(Class(UBERON:0004062))
 Declaration(Class(UBERON:0004060))
-Declaration(Class(UBERON:0006267))
 Declaration(Class(UBERON:0005870))
 Declaration(Class(HsapDv:0000022))
 Declaration(Class(UBERON:0003050))
 Declaration(Class(UBERON:0003072))
 Declaration(Class(UBERON:0004128))
+Declaration(Class(HsapDv:0000018))
 Declaration(Class(UBERON:0003069))
 Declaration(Class(UBERON:0003115))
 Declaration(Class(UBERON:0007123))
@@ -71,11 +62,10 @@ Declaration(Class(UBERON:0000930))
 Declaration(Class(UBERON:0005562))
 Declaration(Class(UBERON:0003091))
 Declaration(Class(UBERON:0000084))
+Declaration(Class(HsapDv:0000021))
 Declaration(ObjectProperty(RO:0002162))
 Declaration(ObjectProperty(RO:0002488))
-Declaration(ObjectProperty(RO:0002492))
 Declaration(ObjectProperty(RO:0002496))
-Declaration(ObjectProperty(RO:0002497))
 
 # Mullerian duct existence starts during Carnegie stage 16 [Homo sapiens]
 SubClassOf(
@@ -125,18 +115,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000025)
 )
 
-# cerebellar plate existence starts during Carnegie stage 16 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 17, present] The cerebellar plate (innerer Kleinhirnwulst of Hochsetter) is present as a clear thickening.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0004008 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002488 HsapDv:0000023)
-)
-
 # chondrocranium existence starts during Carnegie stage 17 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -173,18 +151,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000025)
 )
 
-# foramen ovale of heart existence ends during 38th week post-fertilization and over stage [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 18, start] Internal: in the heart, septum secundum and the associated foramen ovale are appearing; the membranous part of the interventricular septum is beginning to take form; the vomeronasal organ is represented by a groove; choanae develop; some subsegmental buds develop in the bronchial tree; collecting tubules develop from the calices; testicular cords may begin to appear in the male gonad; the paramesonephric duct grows rapidly down through the mesonephros; 1-3 semicircular ducts are present in the internal ear.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0004754 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000075)
-)
-
 # hindgut existence starts during Carnegie stage 09 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -209,18 +175,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000020)
 )
 
-# hindlimb bud existence ends during Carnegie stage 19 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 13, start] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0005418 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000026)
-)
-
 # intermediate mesoderm existence starts during Carnegie stage 09 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -231,42 +185,6 @@ SubClassOf(
     Annotation(dcterms:date "2026-10-10")
     ObjectIntersectionOf(UBERON:0003064 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000016)
-)
-
-# intermediate mesoderm existence ends during Carnegie stage 16 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 09, start] The stomodeum is beginning to form.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0003064 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000023)
-)
-
-# lens placode existence starts during Carnegie stage 12 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 13, present] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0003073 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002488 HsapDv:0000019)
-)
-
-# lens placode existence ends during Carnegie stage 13 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 13, present] Internal: septum primum and foramen primum appear in the heart; right and left lung buds are recognizable, and the trachea begins its development; retinal and lens discs appear; the endolymphatic appendage becomes distinguishable by the end of the stage.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0003073 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000020)
 )
 
 # lung bud existence starts during Carnegie stage 12 [Homo sapiens]
@@ -293,54 +211,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000017)
 )
 
-# mandibular prominence existence ends during Carnegie stage 19 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0005867 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000026)
-)
-
-# mesonephros existence starts during Carnegie stage 11 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 17, present] The mesonephros shows epithelial plaques in the visceral layer of the glomerular capsule and hence can produce urine (Silverman, 1969).")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0000080 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002488 HsapDv:0000018)
-)
-
-# mesonephros existence ends during Carnegie stage 20 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 17, present] The mesonephros shows epithelial plaques in the visceral layer of the glomerular capsule and hence can produce urine (Silverman, 1969).")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0000080 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000027)
-)
-
-# metanephros existence starts during Carnegie stage 14 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 16, present] The metanephros, which is now reniform, is still sacral in level.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0000081 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002488 HsapDv:0000021)
-)
-
 # neural groove existence starts during Carnegie stage 08 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -351,18 +221,6 @@ SubClassOf(
     Annotation(dcterms:date "2026-10-10")
     ObjectIntersectionOf(UBERON:0005061 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000014)
-)
-
-# neural groove existence ends during Carnegie stage 11 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 08, start] The most advanced embryos with regard to endodermal spread are also more advanced in other respects. (Nos. 5960 and 7545 already show a neural groove.) It may be that this endoderm is derived from the caudal part of the primitive streak (fig. 6-2).")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0005061 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000018)
 )
 
 # neural tube existence starts during Carnegie stage 10 [Homo sapiens]
@@ -413,30 +271,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000020)
 )
 
-# notochordal plate existence starts during Carnegie stage 08 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 10, present] Although frequently referred to as the notochord, the axial cells caudal to the prechordal plate are still merely notochordal plate at this stage.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0006267 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002488 HsapDv:0000014)
-)
-
-# notochordal plate existence ends during Carnegie stage 11 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 10, present] Although frequently referred to as the notochord, the axial cells caudal to the prechordal plate are still merely notochordal plate at this stage.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0006267 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000018)
-)
-
 # olfactory pit existence starts during Carnegie stage 15 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -449,18 +283,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000022)
 )
 
-# olfactory pit existence ends during Carnegie stage 18 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 15, start] External: lens vesicles are closed; nasal pits are appearing; hand plates are forming.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0005870 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000025)
-)
-
 # olfactory placode existence starts during Carnegie stage 12 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -471,18 +293,6 @@ SubClassOf(
     Annotation(dcterms:date "2026-10-10")
     ObjectIntersectionOf(UBERON:0003050 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000019)
-)
-
-# olfactory placode existence ends during Carnegie stage 14 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 12, start] The nasal discs become thicker and form a portion of the ectodermal ring on both sides of the closed neuropore (O'Rahilly and Müller, 1985).")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0003050 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000021)
 )
 
 # optic cup existence starts during Carnegie stage 13 [Homo sapiens]
@@ -509,18 +319,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000018)
 )
 
-# optic vesicle existence ends during Carnegie stage 13 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 11, start] Internal: the sinus venosus develops; the oropharyngeal membrane ruptures; the mesonephric duct and nephric tubules appear; the optic vesicle and otic pit develop.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0004128 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000020)
-)
-
 # otic placode existence starts during Carnegie stage 09 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -533,18 +331,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000016)
 )
 
-# otic placode existence ends during Carnegie stage 11 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 09, start] The otic disc (or plate) makes its appearance during stage 9 (fig. 9-6).")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0003069 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000018)
-)
-
 # pharyngeal arch 4 existence starts during Carnegie stage 12 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -555,18 +341,6 @@ SubClassOf(
     Annotation(dcterms:date "2026-10-10")
     ObjectIntersectionOf(UBERON:0003115 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000019)
-)
-
-# pharyngeal arch 4 existence ends during Carnegie stage 17 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 12, absent] Internal: the interventricular septum has begun; the cystic primordium and the dorsal pancreas are becoming distinguishable; the lung bud appears.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0003115 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000024)
 )
 
 # pharyngeal pouch 2 existence starts during Carnegie stage 10 [Homo sapiens]
@@ -593,18 +367,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000011)
 )
 
-# primitive streak existence ends during Carnegie stage 10 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 06, start] In the human, the primitive streak appears first during stage 6.  [Carnegie stage 11, absent] The caudal eminence, which lies between the cloacal membrane and the site of the neurenteric canal, represents the region of the former primitive streak.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0004341 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000017)
-)
-
 # rhombic lip existence starts during Carnegie stage 16 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -629,18 +391,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000016)
 )
 
-# septum transversum existence ends during Carnegie stage 16 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 09, start] Other features that have been identified by stage 9 include the \"cardiac jelly\" (Davis, 1927), the mesocardium, and the septum transversum (Ingalls, 1920).")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0004161 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000023)
-)
-
 # sinus venosus existence starts during Carnegie stage 11 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -651,18 +401,6 @@ SubClassOf(
     Annotation(dcterms:date "2026-10-10")
     ObjectIntersectionOf(UBERON:0002063 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000018)
-)
-
-# sinus venosus existence ends during Carnegie stage 16 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 10, absent] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0002063 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000023)
 )
 
 # somite existence starts during or after Carnegie stage 09 [Homo sapiens]
@@ -677,18 +415,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002496 HsapDv:0000016)
 )
 
-# somite existence ends during or before Carnegie stage 20 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "interval")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 08, absent] The embryo is presomitic, i.e., somites are not yet visible.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0002329 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002497 HsapDv:0000027)
-)
-
 # stomodeum existence starts during Carnegie stage 09 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -699,18 +425,6 @@ SubClassOf(
     Annotation(dcterms:date "2026-10-10")
     ObjectIntersectionOf(UBERON:0000930 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000016)
-)
-
-# stomodeum existence ends during Carnegie stage 17 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 09, start] The stomodeum is beginning to form.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0000930 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000024)
 )
 
 # thymus primordium existence starts during Carnegie stage 13 [Homo sapiens]
@@ -737,18 +451,6 @@ SubClassOf(
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000017)
 )
 
-# thyroid primordium existence ends during Carnegie stage 16 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 10, start] Although a sinus venosus as such is not present until the next stage, left and right sinusal horns appear during stage 10.")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0003091 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000023)
-)
-
 # ureteric bud existence starts during Carnegie stage 14 [Homo sapiens]
 SubClassOf(
     Annotation(TSA:onset_type "point")
@@ -759,18 +461,6 @@ SubClassOf(
     Annotation(dcterms:date "2026-10-10")
     ObjectIntersectionOf(UBERON:0000084 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
     ObjectSomeValuesFrom(RO:0002488 HsapDv:0000021)
-)
-
-# ureteric bud existence ends during Carnegie stage 16 [Homo sapiens]
-SubClassOf(
-    Annotation(TSA:onset_type "point")
-    Annotation(RO:0002558 ECO:0000304)
-    Annotation(rdfs:comment "[Carnegie stage 13, present] A ureteric bud may possibly be present in some specimens (Wells, 1954, fig. 4), although further confirmation is needed.  [Carnegie stage 14, start] Internal: the ventral pancreas (if not detectable earlier) is distinguishable at stages 14 and 15; right and left lung sacs grow dorsad; the ureteric bud acquires a metanephrogenic cap; future cerebral hemispheres and cerebellar plates begin to be visible.  [Carnegie stage 18, present] Collecting tubules develop from the calices at stages 17 and 18 (fig. 18-14).")
-    Annotation(oboInOwl:hasDbXref "O'Rahilly R, Muller F (1987) Developmental Stages in Human Embryos. Carnegie Institution of Washington Publication 637")
-    Annotation(dcterms:contributor "agent:stage-evidence")
-    Annotation(dcterms:date "2026-10-10")
-    ObjectIntersectionOf(UBERON:0000084 ObjectSomeValuesFrom(RO:0002162 NCBITaxon:9606))
-    ObjectSomeValuesFrom(RO:0002492 HsapDv:0000023)
 )
 
 )

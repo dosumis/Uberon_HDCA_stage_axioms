@@ -21,6 +21,7 @@ from pathlib import Path
 
 from .build import render
 from .model import Axiom, PREDICATES
+from .support import CONTEXTUAL, DIRECT, classify, load_records
 
 
 def _evidence_records(evidence_dir: Path) -> dict[str, list[dict]]:
@@ -64,17 +65,20 @@ def selected(axioms: list[Axiom], sourced_only: bool = True) -> list[Axiom]:
     return [a for a in live if a.is_sourced] if sourced_only else live
 
 
-def review_table(axioms: list[Axiom], path: Path) -> None:
+def review_table(axioms: list[Axiom], path: Path,
+                 support: dict[str, str] | None = None) -> None:
     """One row per proposed axiom, in the order a reviewer would read them:
     grouped by structure, with the evidence quote beside the claim it supports."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as fh:
         w = csv.writer(fh, delimiter="\t", lineterminator="\n")
         w.writerow(["uberon_id", "uberon_label", "taxon", "claim",
-                    "stage_id", "stage_label", "evidence", "evidence_code", "source"])
+                    "stage_id", "stage_label", "support", "evidence",
+                    "evidence_code", "source"])
         for a in sorted(axioms, key=lambda a: (a.uberon_label, a.predicate)):
             w.writerow([a.uberon_id, a.uberon_label, a.taxon_label,
                         PREDICATES[a.predicate][0], a.stage_id, a.stage_label,
+                        (support or {}).get(f"{a.uberon_id}|{a.predicate}", ""),
                         a.evidence_text, a.evidence_code, a.source])
 
 
@@ -96,17 +100,28 @@ def with_quotes(axioms: list[Axiom], evidence_dir: Path) -> list[Axiom]:
 
 
 def write(axioms: list[Axiom], out_dir: Path, sourced_only: bool = True,
-          evidence_dir: Path | None = None) -> dict:
+          evidence_dir: Path | None = None, require_support: bool = True) -> dict:
     chosen = selected(axioms, sourced_only)
+    unsupported = 0
+    support: dict[str, str] = {}
     if evidence_dir and evidence_dir.exists():
+        records = load_records(evidence_dir)
+        support = {f"{a.uberon_id}|{a.predicate}": classify(a, records) for a in chosen}
+        if require_support:
+            keep = [a for a in chosen
+                    if support[f"{a.uberon_id}|{a.predicate}"] in (DIRECT, CONTEXTUAL)]
+            unsupported = len(chosen) - len(keep)
+            chosen = keep
         chosen = with_quotes(chosen, evidence_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "uberon-human-stage-gcis.ofn").write_text(
         render(chosen, for_contribution=True))
-    review_table(chosen, out_dir / "review.tsv")
+    review_table(chosen, out_dir / "review.tsv", support)
     return {
         "axioms": len(chosen),
         "structures": len({a.uberon_id for a in chosen}),
         "sourced_only": sourced_only,
-        "withheld": len([a for a in axioms if a.status != "superseded"]) - len(chosen),
+        "unsupported": unsupported,
+        "unsourced": len([a for a in axioms if a.status != "superseded"
+                          and not a.is_sourced]),
     }
