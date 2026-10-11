@@ -15,6 +15,9 @@ done
 Read them first. 001-003 are claims about what Uberon lacks, with the searches
 behind them recorded so a reviewer can repeat them.
 
+**005** reports three incorrect axioms, found by running a fetal corpus against
+Uberon's own bounds.
+
 **004 is different in kind**: it proposes axioms rather than terms, and it is
 the main contribution. Taxon-scoped GCIs need no new identifiers, which is why
 the whole batch goes as one ticket rather than a term request per structure.
