@@ -34,17 +34,60 @@ Three families of relation, each internally type-consistent. Nothing spans conti
 occurrent, so there is no category error.
 
 ```
-C:C   exists_after, exists_immediately_after        continuant → continuant   ← NEW
+C:C   exists_after, exists_directly_after,          continuant → continuant   ← NEW
+      exists_immediately_after
 O:O   preceded_by, immediately_preceded_by          occurrent  → occurrent    (BFO/RO, stages)
 C:O   existence_starts_during, ..._during_or_after  continuant → occurrent    (RO, already used)
 ```
 
-A developmental relation carries the **C:C** relation as a superproperty — both sides continuant:
+The C:C family has **three levels**, each a strict subset of its parent:
+
+| relation | Allen | means |
+|---|---|---|
+| `exists_after` | `dfOMP` | product starts later; a gap is allowed |
+| `exists_directly_after` | `dfOM` | **no gap** — product starts at or before the precursor ends |
+| `exists_immediately_after` | `M` | precursor ends exactly when the product starts |
+
+A developmental relation carries the appropriate level as a superproperty — both sides
+continuant, so no category error:
 
 ```
-transformation_of  ⊑  develops_directly_from
-transformation_of  ⊑  exists_immediately_after
+develops_from                ⊑  exists_after               weakest; a gap is allowed
+directly_develops_from       ⊑  exists_directly_after      no gap
+immediate_transformation_of  ⊑  exists_immediately_after    Allen M, exact
 ```
+
+### Why no relation for budding
+
+`dfOM = M ⊎ dfO`, a **disjoint** union, verified. So directness decomposes exactly into
+transformation (`M`, precursor ends) and budding/delamination (`dfO`, precursor persists) — and
+budding needs no name of its own, because it is *directness minus transformation*.
+
+Neural crest delaminating from a persisting neural tube is therefore just
+`directly_develops_from`: it entails `dfOM`, transformation is not asserted, and the surviving
+disjunction permits `dfO`.
+
+In the closed-world layer this becomes computable rather than merely permitted:
+
+```
+budding(X,Y) :- directly_develops_from(X,Y), not immediate_transformation_of(X,Y).
+```
+
+Stratified negation — the thing OWL cannot do. In OWL you get the honest `dfOM` disjunction.
+
+> **Depends on an RO fix.** RO:0002207's candidate definition says
+> `start(x) ≥ end(y)` — Allen `MP`, which *mandates* the precursor has ended and so forbids the
+> neural-crest case outright. The intended reading is the opposite inequality. Reported as item
+> 1b in `dev_reasoning_experiments/RO_REPORT.md`; it is flagged "Candidate definition", used once
+> in Uberon and never in EHDAA2, so correcting it breaks nothing.
+>
+> Until it is corrected, assert `exists_directly_after` directly rather than relying on the
+> subproperty link from `directly_develops_from`.
+
+**Caveat on `dfOM`**: it is *not* in the composition-closed 29-relation subalgebra — it is a
+union, and unions are not generated from the atoms by composition, converse and intersection. So
+it is assertable and composable *through*, but never the tightest derived result. The same is
+true of RO's `preceded_by`.
 
 Two chains cross between families. The type arithmetic works out unaided — a chain's domain comes
 from its first property, its range from its last:
@@ -117,8 +160,12 @@ relations follow that established pattern:
 
 ```
 http://purl.obolibrary.org/obo/uberon/core#exists_after
+http://purl.obolibrary.org/obo/uberon/core#exists_directly_after
 http://purl.obolibrary.org/obo/uberon/core#exists_immediately_after
 ```
+
+`exists_directly_after` deliberately parallels `directly_develops_from` — "directly" carries the
+no-gap sense in both.
 
 **Aim: promote to RO once the experiments show it worthwhile.** RO currently has *no*
 continuant-to-continuant timing relation at all — the gap is real, and this is the evidence
@@ -148,14 +195,20 @@ Prefix(uc:=<http://purl.obolibrary.org/obo/uberon/core#>)
 Prefix(obo:=<http://purl.obolibrary.org/obo/>)
 
 Declaration(ObjectProperty(uc:exists_after))
+Declaration(ObjectProperty(uc:exists_directly_after))
 Declaration(ObjectProperty(uc:exists_immediately_after))
 TransitiveObjectProperty(uc:exists_after)
-SubObjectPropertyOf(uc:exists_immediately_after uc:exists_after)
+SubObjectPropertyOf(uc:exists_directly_after    uc:exists_after)
+SubObjectPropertyOf(uc:exists_immediately_after uc:exists_directly_after)
 
-# developmental relations carry the C:C relation
-SubObjectPropertyOf(obo:RO_0002495 uc:exists_immediately_after)   # immediate transformation of
-SubObjectPropertyOf(obo:RO_0002494 uc:exists_after)               # transformation of
+# developmental relations carry the appropriate level
 SubObjectPropertyOf(obo:RO_0002202 uc:exists_after)               # develops from
+SubObjectPropertyOf(obo:RO_0002207 uc:exists_directly_after)      # directly develops from *
+SubObjectPropertyOf(obo:RO_0002495 uc:exists_immediately_after)   # immediate transformation of
+# * blocked until RO:0002207's inequality is corrected -- see 2. Assert
+#   exists_directly_after directly on the affected terms meanwhile.
+# transformation_of (RO:0002494) left unaxiomatised: its closure is M* = {M,P},
+# which needs a middle relation we are not minting for 47 assertions.
 
 # the two chains
 SubObjectPropertyOf(ObjectPropertyChain(uc:exists_after obo:RO_0002488) obo:RO_0002496)
@@ -329,12 +382,16 @@ progression.
 
 ## 10. Still open
 
+- **Whether to wait for the RO fix** to RO:0002207 before linking `directly_develops_from`, or
+  assert `exists_directly_after` directly in the interim. The latter unblocks the neural-crest
+  class of case immediately at the cost of a redundant assertion later.
 - **Relation names.** `exists_after` / `exists_immediately_after` are from the original sketch in
   `dev_reasoning_experiments/examples/08a-dos-original.ofn`. Worth settling before they propagate
   into generated artefacts and the RO proposal.
 - **Whether `develops_from` itself should carry `exists_after`.** §2 assumes yes. Measured
   against EHDAA2, 18% of `develops_from` assertions have the precursor demonstrably still present
   when the product appears, so the weaker `exists_after` holds while `preceded_by` would not —
-  but that is one dataset.
+  but that is one dataset. Note RO *defines* `develops_from` as the transitive closure of
+  `directly_develops_from`, so it inherits whatever that is fixed to mean.
 - **Whether the arch series alone is enough to judge.** It exercises the machinery but is small;
   a second series with different shape (the somites, which stagger over 5 stages) would test more.
