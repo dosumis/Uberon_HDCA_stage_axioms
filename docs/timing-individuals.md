@@ -75,14 +75,11 @@ budding(X,Y) :- directly_develops_from(X,Y), not immediate_transformation_of(X,Y
 
 Stratified negation — the thing OWL cannot do. In OWL you get the honest `dfOM` disjunction.
 
-> **Depends on an RO fix.** RO:0002207's candidate definition says
-> `start(x) ≥ end(y)` — Allen `MP`, which *mandates* the precursor has ended and so forbids the
-> neural-crest case outright. The intended reading is the opposite inequality. Reported as item
-> 1b in `dev_reasoning_experiments/RO_REPORT.md`; it is flagged "Candidate definition", used once
-> in Uberon and never in EHDAA2, so correcting it breaks nothing.
->
-> Until it is corrected, assert `exists_directly_after` directly rather than relying on the
-> subproperty link from `directly_develops_from`.
+> **This contradicts RO's current definition of RO:0002207, and the POC proceeds anyway.**
+> That definition says `start(x) ≥ end(y)` — Allen `MP` — which mandates the precursor has ended
+> and so forbids the neural-crest case outright. We take the relation to mean what it evidently
+> intends. See §11 for the full list of what RO would have to change for this work to be
+> compatible, and item 1b of `dev_reasoning_experiments/RO_REPORT.md` for the issue as filed.
 
 **Caveat on `dfOM`**: it is *not* in the composition-closed 29-relation subalgebra — it is a
 union, and unions are not generated from the atoms by composition, converse and intersection. So
@@ -205,8 +202,7 @@ SubObjectPropertyOf(uc:exists_immediately_after uc:exists_directly_after)
 SubObjectPropertyOf(obo:RO_0002202 uc:exists_after)               # develops from
 SubObjectPropertyOf(obo:RO_0002207 uc:exists_directly_after)      # directly develops from *
 SubObjectPropertyOf(obo:RO_0002495 uc:exists_immediately_after)   # immediate transformation of
-# * blocked until RO:0002207's inequality is corrected -- see 2. Assert
-#   exists_directly_after directly on the affected terms meanwhile.
+# * contradicts RO:0002207's current definition, deliberately -- see 11
 # transformation_of (RO:0002494) left unaxiomatised: its closure is M* = {M,P},
 # which needs a middle relation we are not minting for 47 assertions.
 
@@ -382,9 +378,6 @@ progression.
 
 ## 10. Still open
 
-- **Whether to wait for the RO fix** to RO:0002207 before linking `directly_develops_from`, or
-  assert `exists_directly_after` directly in the interim. The latter unblocks the neural-crest
-  class of case immediately at the cost of a redundant assertion later.
 - **Relation names.** `exists_after` / `exists_immediately_after` are from the original sketch in
   `dev_reasoning_experiments/examples/08a-dos-original.ofn`. Worth settling before they propagate
   into generated artefacts and the RO proposal.
@@ -395,3 +388,39 @@ progression.
   `directly_develops_from`, so it inherits whatever that is fixed to mean.
 - **Whether the arch series alone is enough to judge.** It exercises the machinery but is small;
   a second series with different shape (the somites, which stagger over 5 stages) would test more.
+
+---
+
+## 11. What RO would have to change for this to be compatible
+
+This is a proof of concept. It asserts things RO currently contradicts, deliberately, to find
+out whether the approach is worth the effort. Nothing here is contributed upstream as it stands.
+
+If it proves out, these are the changes that would make it compatible. All are filed with
+evidence in `dev_reasoning_experiments/RO_REPORT.md`.
+
+| # | Change | Why this work needs it | Cost to RO |
+|---|---|---|---|
+| 1 | **Add continuant-to-continuant timing relations.** RO has none at all. | The whole C:C family is minted locally in `uberon/core#` for want of them | 3 new relations |
+| 2 | **Fix the inequality in `directly develops from` (RO:0002207)**: `start(x) ≥ end(y)` → `≤`. | We link it to `exists_directly_after` (`dfOM`); RO's definition says `MP`, the near-opposite, which forbids delamination | 1 definition; relation used **once** in Uberon, never in EHDAA2, already flagged "Candidate definition" |
+| 3 | **Add `starts after`** — the missing converse of `starts before` (RO:0002089). | Needed to state the weakest safe developmental claim at all | 1 relation |
+| 4 | **Declare missing inverses** on `existence starts during`, `existence ends during`, `transformation of`, `immediate transformation of`, `ends after`. | Without them, chains are walkable in one direction only; `A ⊑ ∃R.B` does not entail `B ⊑ ∃R⁻.A` | 6 axioms |
+
+### Two we are living with rather than asking RO to change
+
+**`develops_from` inherits whatever `directly_develops_from` is fixed to mean**, since RO defines
+it as that relation's transitive closure. If change 2 lands, `develops_from` tightens with it. We
+assign it the weakest level (`exists_after`) regardless, which stays sound either way —
+under-committing never produces a false entailment.
+
+**RO:0002496 / RO:0002497 are one-sided and non-strict.** `existence starts during or after` is
+`α(x) ≥ α(y)`, permitting equal starts, so it is weaker than the strict `dfOMP` we reason with.
+That costs recall, not soundness: fewer conflicts are detectable than would be under a strict
+reading. Measured on EHDAA2, the difference is 50 detectable `develops_from` conflicts under a
+strict reading against 14 under RO's actual semantics.
+
+### What this means for the POC
+
+Run it against a local merge of RO plus `src/timing/relations.ofn`. Do **not** expect the result
+to be consistent with stock RO — change 2 in particular is a direct contradiction, and that is
+the point: if the approach works, the contradiction is the argument for the fix.
