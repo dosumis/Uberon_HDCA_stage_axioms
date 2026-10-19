@@ -165,30 +165,55 @@ Individuation buys exactly three things. All three are unavailable at class leve
 
 | | |
 |---|---|
-| **Succeeds if** | the chains derive timing for a structure that was never assigned any, on real curated rows, and the error check flags at least one genuine conflict (or demonstrably clears all 176) |
-| **Fails if** | everything derived was already asserted — then individuation bought nothing, and we have learned that for the cost of one branch |
+| **Succeeds if** | a structure that was never assigned a bound acquires one, derived from real curated rows; and the conflict check either flags something genuine or demonstrably clears all 176 |
+| **Fails if** | everything derived was already asserted — then the atlas bought nothing, and we have learned that for the cost of one branch |
+
+### The atlas layer does not run in OWL
+
+The class layer stays in OWL — it is proven, it integrates with ROBOT and relation-graph, and it
+is what feeds Uberon. The **atlas layer does not**, and the reason is that OWL is bad at exactly
+the operations this layer exists to perform:
+
+- *Composition is disjunctive.* Most compositions of two Allen relations yield a **set** of
+  possible relations; a property chain concludes exactly one. The full table is 841 compositions
+  (29 relations × 29), **132 of which OWL 2 rejects** outright as cyclic under the regularity
+  condition. In Datalog the same table is **one rule** over 169 facts, and the regularity wall
+  does not exist.
+- *Narrowing is object-property intersection*, which OWL 2 does not have at all. Two routes
+  giving `dfO` and `osd` should narrow to `d`; in OWL they cannot be combined.
+- *Inconsistency is a global failure in OWL* and a **derived fact** in Datalog. That difference
+  decides §10.
+
+Each of the three benefits above is also better served outside OWL: a Datalog constant *is* a
+node where routes meet; inverses are one rule (`rel(Y,X,Ri) :- rel(X,Y,R), conv(R,Ri)`) rather
+than six RO inverse declarations that do not yet exist (§15, item 4).
+
+So the split is **by layer, not by phase**: OWL/ELK for classes, Soufflé for the atlas.
+[`datalog/allen.dl`](https://github.com/dosumis/dev_reasoning_experiments/blob/584150e/datalog/allen.dl)
+already implements composition, converse, one-round narrowing, inconsistency and promotion in 56
+lines, against the verified composition table.
+
+### The reasoning aims, deliberately limited
+
+Three, scoped so the POC stays tractable and each can be checked by hand:
+
+| | aim | mechanism |
+|---|---|---|
+| 1 | **Compute** the Allen relation between every pair of structures whose bounds are both curated | integer comparison — no propagation needed |
+| 2 | **Bound** the structures whose bounds are *not* curated, from their relations to those that are | composition + one round of narrowing |
+| 3 | **Flag** any pair whose label narrows to the empty set | a derived `inconsistent(X,Y)` fact |
+
+Aim 1 is where most of the data sits and needs no interval calculus at all: Carnegie stages are a
+totally ordered discrete series, so a structure with both bounds curated is a pair of integers.
+**Allen earns its place only on aim 2**, which on the first test is three structures (§11).
 
 ### Explicitly *not* in this POC
 
-This matters, because an earlier draft justified the layer by capabilities it does not deliver.
-
-**Allen path-consistency and narrowing are deferred.** The long-run motivation for an individual
-layer is full interval reasoning: composing relations and narrowing disjunctive labels. Neither
-is possible in OWL —
-
-- *Composition is disjunctive.* Most compositions yield a **set** of possible relations; a
-  property chain concludes exactly one. The full table is 841 compositions (29 relations × 29),
-  **132 of which OWL 2 rejects** outright as cyclic under the regularity condition.
-- *Narrowing is object-property intersection*, which OWL 2 does not have. Two routes giving
-  `dfO` and `osd` should narrow to `d`. In OWL they cannot be combined at all.
-
-Both are closed-world problems, natural in Datalog — one rule for composition, stratified
-negation for narrowing — and
-[REASONING_STACK.md](https://github.com/dosumis/dev_reasoning_experiments/blob/584150e/REASONING_STACK.md)
-measures that case. **This POC does none of it.** §9 runs HermiT over OWL individuals, which is
-still open-world: it materialises chains and detects contradictions, and that is all. The three
-benefits listed above do not require narrowing, which is why the POC is worth running before
-committing to a Datalog stack. If it succeeds, Soufflé is the next branch, not this one.
+- **Full path consistency.** One round of narrowing, not iterated to fixpoint — the strata do not
+  simply stack, as `REASONING_STACK.md` records. §11 measures what one round costs, exactly,
+  by brute force.
+- **Promotion back into OWL** (§13). Deferred, and nothing here depends on it.
+- **Spatial reasoning over the atlas**, and anything that is not developmental anatomy.
 
 ---
 
@@ -259,10 +284,16 @@ exists_after            ∘ existence_starts_during  ⊑  existence_starts_durin
 existence_starts_during ∘ preceded_by              ⊑  existence_starts_during_or_after
 ```
 
-**This is the step that makes the layer pay.** Asserting only `liver transformation_of
-liver_bud` — nothing about stages — ELK derives `liver ⊑ existence_starts_during_or_after some
-CS11`, reaching a stage anchor two developmental steps away
+**These chains are class-level, and they already work.** Asserting only `liver
+transformation_of liver_bud` — nothing about stages — ELK derives `liver ⊑
+existence_starts_during_or_after some CS11`, reaching a stage anchor two developmental steps
+away
 ([`08-develops-from-timing.ofn`](https://github.com/dosumis/dev_reasoning_experiments/blob/584150e/examples/08-develops-from-timing.ofn)).
+
+That result is the reason the class layer stays in OWL and is not re-implemented in Datalog. The
+atlas layer does something different — it reasons over *intervals*, not subsumption — and §3 is
+why it does so elsewhere. The two share the vocabulary in the table above: the Allen column is
+the C:C relations' meaning in OWL **and** their label in the fact table.
 
 ### Why no relation for budding
 
@@ -287,7 +318,7 @@ honest `dfOM` disjunction and nothing more.
 > **This contradicts RO's current definition of RO:0002207, and the POC proceeds anyway.**
 > That definition says `start(x) ≥ end(y)` — Allen `MP` — which mandates the precursor has ended
 > and so forbids the neural-crest case outright. We take the relation to mean what it evidently
-> intends. §14 lists everything RO would have to change for this work to be contributable.
+> intends. §15 lists everything RO would have to change for this work to be contributable.
 
 **Caveat on `dfOM`**: it is *not* in the composition-closed 29-relation subalgebra — it is a
 union, and unions are not generated from the atoms by composition, converse and intersection. So
@@ -344,7 +375,7 @@ because that is all the source has. The staggered onset that makes the somite se
 interesting **is not in Uberon and is not in this repo**, so the individuals would carry no
 information their shared parent did not. Minting them would be machinery without a payload.
 
-Deferred until there is a source for per-index bounds. §13 notes what that would take.
+Deferred until there is a source for per-index bounds. §14 notes what that would take.
 
 ---
 
@@ -390,14 +421,24 @@ needed to argue for filling it. Until then, no OBO IDs are minted.
 ## 8. Files to add
 
 ```
-src/timing/relations.ofn          the three C:C relations + subproperty links + chains  (~40 lines)
-src/timing/individuate.tsv        which terms expand, and how
-src/timing/families.tsv           index-matched family pairs
-sparql/individuate.ru             mint individuals + OPAs from the flagged terms
-sparql/checks/timing.rq           report conflicts, keyed on the SOURCE axiom
-src/taxon_stage/disjointness.py   generate the stage-disjointness module
-tests/test_timing.py              entailment assertions
+CLASS LAYER (OWL, unchanged in kind)
+  src/timing/relations.ofn        the three C:C relations + subproperty links + chains (~40 lines)
+  src/taxon_stage/disjointness.py generate the stage-disjointness module
+
+ATLAS LAYER (Datalog)
+  src/timing/individuate.tsv      which terms expand, and how
+  src/timing/families.tsv         index-matched family pairs
+  sparql/export-facts.rq          atlas -> Soufflé .facts, with provenance
+  datalog/timing.dl               the reasoning; built on allen.dl
+  datalog/stages.facts            Carnegie stage -> ordinal
+  src/taxon_stage/calibrate.py    brute-force ground truth for the k<=3 case (12)
+  tests/test_timing.py            assertions on derived facts
 ```
+
+`datalog/timing.dl` is mostly not new work:
+[`allen.dl`](https://github.com/dosumis/dev_reasoning_experiments/blob/584150e/datalog/allen.dl)
+already carries composition, converse, narrowing and inconsistency. What this repo adds is the
+`part_of` containment rule, the stage-ordinal join, and the report.
 
 ### `src/timing/relations.ofn`
 
@@ -442,7 +483,7 @@ UBERON:0002329  somite                               excluded     dos      2026-
 UBERON:0010531  metanephros induced blastemal cells  excluded     dos      2026-10-18  unenumerated population
 ```
 
-Emitted into the artefact as `TSA:individuate "singleton"` before `individuate.ru` runs.
+Emitted into the artefact as `TSA:individuate "singleton"` before `export-facts.rq` runs.
 
 ### `src/timing/families.tsv`
 
@@ -466,55 +507,66 @@ the repo is as it was.
 
 Three passes, in different profiles, for different reasons. An earlier draft blurred these.
 
-| pass | input | engine | profile | detects |
-|---|---|---|---|---|
-| A — class-level conflict check | scoped classes + disjointness module | **ELK** | EL | unsatisfiable class → names one term |
-| B — individual materialisation | individuals + relations.ofn | **HermiT** | DL input, RL content | derives OPAs via chains |
-| C — conflict report | B's output | **SPARQL** | — | conflicting timings as report rows |
+| pass | input | engine | detects |
+|---|---|---|---|
+| A — class-level conflict check | scoped classes + disjointness module | **ELK** | unsatisfiable class → names one term |
+| B — fact export | `scoped.ofn` + `relations.ofn` | **ROBOT / SPARQL** | — (translation only) |
+| C — interval reasoning | the exported `.facts` | **Soufflé** | computes, composes, narrows, flags |
 
-Pass A is class-level and stays with ELK — that is where the existing build already lives. Pass B
-needs HermiT because **ELK does not materialise ABox property chains** (3 derived facts against
-HermiT's 9 on the same input); the limitation is ELK's, not the EL profile's. Whelk implements
-them but is 45× slower than HermiT at 5,000 individuals. HermiT handles 5,000 in 5.5 s and adds
-no dependency.
+Pass A is class-level and stays with ELK — that is where the existing build already lives, and a
+conflict there names one term. Pass B is pure translation: it walks the tagged classes and writes
+Datalog facts. Pass C is the atlas layer, and runs no OWL reasoner at all.
 
-The individual layer's *content* is in **OWL 2 RL** — the profile designed for rule engines — so
-if HermiT stops being adequate, Soufflé or RDFox becomes available without changing the model.
-The class-level layer cannot move: RL bans `∃R.C` in superclass position, which is how OBO states
-everything.
+**No HermiT pass.** An earlier draft had one, on the grounds that ELK does not materialise ABox
+property chains. That is true of ELK, but it was answering the wrong question — the chains it
+would have materialised are a weak shadow of what pass C computes directly (§3).
+
+The split is forced in both directions. The atlas layer's content is in **OWL 2 RL** — the
+profile designed for rule engines — which is why it ports to Soufflé (or RDFox) without changing
+the model. The class layer cannot follow it: RL bans `∃R.C` in superclass position, which is how
+OBO states everything.
 
 ```makefile
-$(BUILD)/individuals.ttl: $(BUILD)/scoped.ofn src/timing/relations.ofn sparql/individuate.ru
+$(BUILD)/facts/rel.facts: $(BUILD)/scoped.ofn src/timing/relations.ofn sparql/export-facts.rq
 	$(ROBOT) merge --input $(BUILD)/scoped.ofn --input src/timing/relations.ofn \
 	  --output $(BUILD)/timing-input.ofn
-	$(ROBOT) query --input $(BUILD)/timing-input.ofn --update sparql/individuate.ru --output $@
+	@mkdir -p $(BUILD)/facts
+	$(ROBOT) query --input $(BUILD)/timing-input.ofn \
+	  --query sparql/export-facts.rq $(BUILD)/facts/rel.facts
 
-individuate: $(BUILD)/individuals.ttl   ## mint individuals for flagged terms
+facts: $(BUILD)/facts/rel.facts         ## export the atlas as Datalog facts
 
-$(BUILD)/timing-report.tsv: $(BUILD)/individuals.ttl
-	$(ROBOT) reason --reasoner HermiT --input $< --axiom-generators PropertyAssertion \
-	  --output $(BUILD)/timing-reasoned.ofn
-	$(ROBOT) query --input $(BUILD)/timing-reasoned.ofn --query sparql/checks/timing.rq $@
+$(BUILD)/timing-report.tsv: $(BUILD)/facts/rel.facts datalog/timing.dl
+	souffle -F $(BUILD)/facts -D $(BUILD)/out datalog/timing.dl
+	cp $(BUILD)/out/report.csv $@
 
-timing: $(BUILD)/timing-report.tsv      ## derive timings and report conflicts
+timing: $(BUILD)/timing-report.tsv      ## derive timings, narrow, report conflicts
 ```
 
-### `sparql/individuate.ru`, in outline
+### `sparql/export-facts.rq`, in outline
 
-Same shape as `expand.ru` — a SPARQL update over the artefact, because it has to work on axioms
-we did not write.
+Same shape as `expand.ru` — a SPARQL query over the artefact, because it has to work on axioms we
+did not write. It mints the same IRIs §7 describes; they are simply Datalog constants now rather
+than OWL individuals.
 
 ```
 BIND(REPLACE(STR(?struct), "^.*[/#]", "") AS ?structLocal)
 BIND(REPLACE(STR(?taxon),  "^.*[/#]", "") AS ?taxonLocal)
-BIND(IRI(CONCAT("https://w3id.org/taxon-stage-axioms/individual/",
-                ?structLocal, "-", ?taxonLocal)) AS ?ind)
+BIND(CONCAT(?structLocal, "-", ?taxonLocal) AS ?ind)
 ```
 
-It fires where a scoped class carries `TSA:individuate`, mints the individual, types it to the
-scoped class, and carries each `existence_*` and developmental restriction down to an OPA between
-the corresponding individuals. It only fires where **both** endpoints are individuated, which is
-what keeps the layer boundary from needing a convention.
+It fires where a scoped class carries `TSA:individuate`, and emits one fact per curated bound and
+one per developmental relation, each tagged with the source axiom. It only fires where **both**
+endpoints are individuated, which is what keeps the layer boundary from needing a convention.
+
+Two fact tables come out, and the split matters because it is the §3 aim-1/aim-2 split made
+concrete:
+
+```
+interval(Ind, StartOrd, EndOrd)      # both bounds curated   -> aim 1, comparison
+startsAt(Ind, StartOrd)              # start only            -> aim 2, propagation
+rel(X, Y, Label, SourceAxiom)        # asserted developmental relations
+```
 
 ---
 
@@ -539,31 +591,40 @@ A product asserted to start before its own precursor becomes **unsatisfiable**. 
 `src/taxon_stage/disjointness.py`: for 23 Carnegie stages, 46 defined classes and **253
 disjointness axioms**, C(N,2) growth, 0.6 s under ELK.
 
-### Decision: the disjointness module runs in pass A only, never against the individuals
+### The two layers detect conflicts differently, and that is the point
 
-This is a design decision, not a detail, because the two layers fail differently:
+Moving the atlas out of OWL dissolves a problem an earlier draft had to work around:
 
-| | class level (pass A, ELK) | individual level (pass B, HermiT) |
+| | class level (pass A, ELK) | atlas level (pass C, Soufflé) |
 |---|---|---|
-| a conflict shows up as | an **unsatisfiable class** | an **inconsistent ABox** |
-| what it points at | one named term | nothing — inconsistency is global |
-| what `robot reason` does | reports the class, build continues | **fails outright, produces no output** |
+| a conflict shows up as | an **unsatisfiable class** | a derived `inconsistent(X,Y)` fact |
+| what it points at | one named term | the specific pair, with its source axioms |
+| effect on the rest of the run | none — build continues | **none** — it is just another row |
 
-An inconsistent ABox would take the whole report down with it, so a single bad row would hide
-every other result — the opposite of what the next subsection requires.
+In OWL the atlas-level conflict would have been an **inconsistent ABox**: global, pointing at
+nothing, and fatal — `robot reason` fails outright and emits no report, so one bad row would hide
+every other result. The earlier draft therefore had to keep the disjointness module away from the
+individuals to protect the report.
 
-So: **the disjointness module is merged into pass A and excluded from pass B.** Pass B stays
-satisfiable by construction and its conflicts are found by pass C, as SPARQL rows over the
-materialised output — a conflict becomes a line in a report, not a build failure. Both checks run;
-neither can silence the other.
+In Datalog an empty label is simply a fact you query for. Narrowing to `{}` yields
+`inconsistent(X,Y)` alongside everything else that was derived, so **a conflict costs you that
+pair and nothing more**. The disjointness module stays in pass A because that is where it is
+cheap and where it names a term; it is not kept out of the atlas to avoid damage, because there
+is no damage to avoid.
+
+Both checks run. Neither can silence the other.
 
 ### Two things the generator must do from the start
 
 **Report against the source axiom, not the generated individual.**
-`UBERON_0003120-9606 is unsatisfiable` is useless to a curator. The report needs to name the
-asserted axiom and the row of `src/axioms.tsv` it came from. That means `individuate.ru` emits a
-provenance triple per generated OPA — `TSA:derived_from` pointing at the source restriction — and
-`sparql/checks/timing.rq` joins through it.
+`inconsistent(UBERON_0003120-9606, UBERON_0003114-9606)` is useless to a curator. The report
+needs to name the asserted axiom and the row of `src/axioms.tsv` it came from. That means
+`export-facts.rq` carries a source-axiom column on every emitted fact, Soufflé propagates it
+through the derivation, and the report joins back to the TSV row.
+
+Carrying provenance through a Datalog derivation is not free — a derived fact has *many*
+ancestors, so the rule heads must thread a justification term. Soufflé's provenance machinery
+(`--provenance`) does this natively, which is a second reason to prefer it over hand-rolling.
 
 **Carry evidence across the boundary.** This repo is rigorous about evidence per axiom. A
 generated individual should inherit the evidence annotation of the class-level assertion it came
@@ -615,47 +676,115 @@ chains give them one from their arch, the layer has produced something nobody cu
 
 ### What it proves, in order
 
-1. **The chains fire on real curated data** — arteries 3/4/6 acquire end bounds they were never
-   assigned.
-2. **The error check catches a real error** — run pass A over all 176 rows and see whether
-   anything already present trips it; if nothing does, seed one backwards `transformation_of`
-   and confirm it is caught.
-3. **Inverses are walkable** — "what develops from arch 3?" returns artery 3, which is not a
-   query the class-level artefact can answer.
+Mapped to the three aims of §3:
+
+1. **Aim 1 — computation.** All pairwise relations among the seven fully-curated structures fall
+   out by comparison. `artery 1 o arch 3`, `arch N Fef arch M`. No interval calculus needed; if
+   this does not work nothing else will.
+2. **Aim 2 — propagation.** Arteries 3, 4 and 6 acquire end bounds they were never assigned.
+   This is the one that justifies the layer, and the one to watch.
+3. **Aim 3 — conflict.** Run over all 176 rows and see whether anything already curated trips
+   `inconsistent`. If nothing does, seed one backwards `transformation_of` and confirm it is
+   caught, and that the rest of the report survives it.
+
+A fourth thing the test should demonstrate, which is not reasoning but is half the point of the
+atlas: **inverses are walkable.** "What develops from arch 3?" returns artery 3 — not a question
+the class-level artefact can answer.
+
+### Calibration: exact ground truth, once
+
+Aim 2 uses **one round of narrowing, not full path consistency** (§3). On this test we can
+measure exactly what that costs, because the under-determined set is small enough to solve by
+brute force.
+
+A Carnegie-staged interval is one of C(23,2) = **253** candidates, so enumerating every
+assignment to *k* under-determined structures costs 253^k:
+
+| k | search space | time |
+|---|---|---|
+| 2 | 64,009 | 3 s |
+| **3 — this test** | **16.2M** | **12.6 min** |
+| 4 | 4.1 bn | 53 h |
+| 5 | 1.0 tn | 1.5 yr |
+
+So `calibrate.py` enumerates all 16.2M assignments for arteries 3, 4 and 6, keeps those
+consistent with every curated bound, and intersects them. That is the exact answer. Comparing it
+against what one round of narrowing produced tells us precisely what the cheap inference missed.
+
+**Note what governs this**: *k*, the number of under-determined structures — **not** the number
+of structures. The cliff is at k=4. This is a one-off calibration on a deliberately small open
+set, not a tool that scales, and it is not meant to be one — run it once to quantify the
+approximation, then never again.
 
 ---
 
-## 12. Deferred
+## 12. How this scales
 
-**Allen composition and narrowing.** The long-run reason for an individual layer; see §3 for why
-it is out of scope here and what it would need (Soufflé, stratified negation). This POC is partly
-a test of whether that investment is justified.
+Measured on synthetic networks with the real composition table, 85% of pairs hidden. Python; a
+Soufflé implementation of the same fixpoint runs roughly 50–100× faster.
+
+| n | asserted | pairs after closure | exactly determined | mean label size | sec |
+|---|---|---|---|---|---|
+| 40 | 113 | 1,480 | 742 | 2.96 | 0.26 |
+| 80 | 456 | 6,286 | 4,694 | 1.68 | 1.63 |
+| 160 | 1,882 | 25,440 | 23,896 | 1.14 | 10.8 |
+| 320 | 7,651 | 102,080 | 101,398 | 1.01 | 84.7 |
+
+**Time is ~n³.** Doubling n costs about 7×. At EHDAA2 scale (~2,000 structures) that is roughly
+20 billion operations — single-digit minutes in Soufflé, as a batch job. Time is not the binding
+constraint.
+
+**The closure densifies to all pairs.** At n=320, 7,651 asserted edges close to 102,080 — exactly
+n(n−1). The input was 15% sparse; the output is complete. So the result is Θ(n²) in size
+**regardless of input sparsity**, and memory binds before time: 4.5M pairs at n=2,000, 100M at
+n=10,000. If specific answers are wanted rather than the whole closure, Soufflé's magic-set
+transformation restricts evaluation to the relevant pairs.
+
+**Precision improves as the network grows.** Mean label size falls 3.00 → 1.01 and the
+exactly-determined fraction rises from 58% to 99.3%. More intervals means more triangles means
+more narrowing. This inverts the usual intuition and is the strongest argument for the approach:
+the thing you would expect to degrade is the thing that gets better.
+
+**The lever is partitioning, and it is semantically forced anyway.** All-pairs closure across
+developmental anatomy is not something to want — the Allen relation between a human pharyngeal
+arch and a mouse metanephros is meaningless. Partition by taxon × organ system and n stays in the
+tens to low hundreds, where every row above is sub-second. The arch system is 10 structures; a
+whole embryo's major structures is perhaps 500.
+
+Good enough for the POC. Alternatives — ASP for proper fixpoint narrowing, demand-driven
+evaluation, incremental maintenance — are research for later, not blockers now.
+
+---
+
+## 13. Deferred
+
+**Full path consistency.** The atlas runs one round of narrowing, not iteration to fixpoint —
+each round depends on the previous round's negation, so the strata do not simply stack. ASP
+(clingo) handles the non-monotonicity more naturally. §11 measures what one round costs on the
+first test, which is the evidence needed to decide whether this matters.
 
 **Minted-index series.** Somites, and anything else where one Uberon term covers a numbered
 series. Blocked on a source for per-index bounds (§6).
 
-**The macro stack.** ROBOT + SPARQL, because the convention exists here and costs nothing to
-extend. If string handling becomes the bottleneck: `py-horned-owl` rejects malformed axioms at
-construction and parses Uberon 11× faster than rdflib; `owlready2` does neither — it silently
-serialises a string where a class belongs. Refactoring belongs on its own branch, measured
-against this one.
+**The macro stack.** ROBOT + SPARQL for fact export, because the convention exists here and costs
+nothing to extend. If string handling becomes the bottleneck: `py-horned-owl` rejects malformed
+axioms at construction and parses Uberon 11× faster than rdflib; `owlready2` does neither — it
+silently serialises a string where a class belongs. Refactoring belongs on its own branch,
+measured against this one.
 
-**Promotion back to OWL.** Turning individual-level results into class axioms is **entailable**:
-`EquivalentClasses(C ObjectOneOf(...))` plus individual timings lets HermiT derive the class-level
-axiom, and a negative control confirms it is withheld when a member violates. But it is
-**DL-only** — multi-individual `ObjectOneOf` is not in EL — and costs 10 s at 500 individuals
-against microseconds for the same universal in SPARQL.
+**Promotion back to OWL.** Turning atlas results into class axioms. In Datalog the rule is
+direct — a universal over a closed set, which is `promote(C,S)` in `allen.dl`, already written —
+but emitting the result as OWL and getting it back into the class layer is a step this POC does
+not take. Treat promotion as a **manual diagnostic, not a build target**: run it once on the arch
+series to see whether anything class-level falls out, because that is informative either way.
+Nothing in §11's success criteria depends on it.
 
-Treat promotion as a **manual diagnostic, not a build target**: run it once on the arch series to
-see whether anything class-level falls out, because that is informative either way. Nothing in
-§11's success criteria depends on it.
-
-**Everything that is not developmental anatomy.** Cell-type timing, HP onset, disease
-progression.
+**Spatial reasoning over the atlas**, and **everything that is not developmental anatomy** —
+cell-type timing, HP onset, disease progression.
 
 ---
 
-## 13. Still open
+## 14. Still open
 
 - **Whether `develops_from` itself should carry `exists_after`.** §5 assumes yes. Measured
   against EHDAA2, 18.3% of `develops_from` assertions have the precursor demonstrably still
@@ -672,7 +801,7 @@ progression.
 
 ---
 
-## 14. What RO would have to change for this to be compatible
+## 15. What RO would have to change for this to be compatible
 
 This is a proof of concept. It asserts things RO currently contradicts, deliberately, to find
 out whether the approach is worth the effort. Nothing here is contributed upstream as it stands.
