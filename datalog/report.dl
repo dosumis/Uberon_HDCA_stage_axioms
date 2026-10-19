@@ -83,6 +83,33 @@ conflict_summary(B1, B2, N) :- conflict(_, _), base(_, B1), base(_, B2),
     N = count : { conflict(W1, W2), base(W1, B1), base(W2, B2) }, N > 0.
 .output conflict_summary(IO=file, filename="conflict_summary.csv", delimiter=",", headers=true, rfc4180=true)
 
+// ---------------------------------------------------------------- per-axiom view
+//
+// For each distinct conflict (by asserted bounds), the Uberon axioms behind
+// its smallest explanation. Where a conflict is reached both directly and
+// through inheriting subclasses, the instance with fewest path constraints is
+// the explanation; ties are all kept.
+
+.decl base_edge(why: symbol, asserted: symbol)
+base_edge(W, W) :- edge(_, _, _, W).
+base_edge(W2, W) :- edge(G, R, _, W), struct_rel(R), anc(M, G), W2 = cat(W, " | inherited by ", M).
+
+.decl instance_size(lower: symbol, upper: symbol, n: number)
+instance_size(W1, W2, N) :- conflict(W1, W2), N = count : { excursion_edge(W1, W2, _, _, _, _) }.
+
+.decl smallest(b1: symbol, b2: symbol, n: number)
+smallest(B1, B2, N) :- conflict_summary(B1, B2, _),
+    N = min M : { instance_size(W1, W2, M), base(W1, B1), base(W2, B2) }.
+
+.decl chosen(lower: symbol, upper: symbol, b1: symbol, b2: symbol)
+chosen(W1, W2, B1, B2) :- smallest(B1, B2, N), instance_size(W1, W2, N), base(W1, B1), base(W2, B2).
+
+// Rows: the conflict (asserted bounds), the instance shown, one Uberon axiom on its path.
+.decl conflict_axiom(lower: symbol, upper: symbol, via_lower: symbol, via_upper: symbol, axiom: symbol)
+conflict_axiom(B1, B2, W1, W2, A) :- chosen(W1, W2, B1, B2), excursion_edge(W1, W2, _, _, _, W),
+    base_edge(W, A).
+.output conflict_axiom(IO=file, filename="conflict_axiom.csv", delimiter=",", headers=true, rfc4180=true)
+
 // Cycles among structures alone, with no stage involved.
 .decl cycle(a: symbol, op: symbol, b: symbol, why: symbol)
 cycle(SA, Op, SB, W) :- cycle_edge(A, B, Op, W), show(A, SA), show(B, SB).
