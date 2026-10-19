@@ -2,9 +2,10 @@
 
 **Status: draft for discussion. Nothing in the build implements this yet.**
 
-> **New to this?** Read §1 and §2. §1 is what this repo does today and what it cannot do; §2 is
-> what this proof of concept adds and — just as important — what it deliberately does not.
-> §3 is a key to the notation. Everything from §4 on is implementation detail.
+> **New to this?** Read §1–§3. §1 is what this repo does today and the questions it cannot
+> answer; §2 is the central idea — reading an anatomy ontology as an atlas of one idealised
+> individual; §3 is what this proof of concept tests and, just as important, what it
+> deliberately does not. §4 is a key to the notation. §5 on is implementation detail.
 
 This plan originates in experiments in a separate repo,
 [dosumis/dev_reasoning_experiments](https://github.com/dosumis/dev_reasoning_experiments). Every
@@ -58,17 +59,93 @@ Structures are continuants. Stages are occurrents. The timing relations RO offer
 continuant-to-occurrent. There is no relation in RO that puts two *structures* in temporal order,
 so there is nothing for `develops_from` to be a subproperty of.
 
-§4 is the fix for that. §2 is why we are bothering.
+§5 is the fix for that. §2 and §3 are why we are bothering.
 
 ---
 
-## 2. Aims: what this POC tests
+## 2. The idea: anatomy as an atlas of an idealised individual
 
-One claim, stated so it can fail:
+An anatomy ontology like Uberon describes **classes**. `UBERON:0003114 pharyngeal arch 3` stands
+for every pharyngeal arch 3 in every embryo that has one. That is the right representation for
+nearly everything, and it stays the source of truth here — nothing below replaces it.
 
-> **Generating one individual per structure per idealised organism lets timing information that
-> is today spread across unconnected class axioms meet at a single node, and produces structure-
-> to-structure timing that nobody curated.**
+But the same content can be read a second way. An **anatomical atlas** does not describe classes;
+it describes **one specimen** — this embryo, with these parts, laid out. The parts of a specimen
+are not classes but **individuals**: not "pharyngeal arch 3" in general, but *the* pharyngeal
+arch 3 *of this organism*.
+
+Make the specimen idealised rather than real — a canonical human embryo rather than one on a
+slide — and you get an **atlas of an idealised individual**: one node per structure that a normal
+organism has a determinate number of. This is what developmental atlases and anatomical
+nomenclature have always implicitly described, and it is what we make explicit here.
+
+### Which structures can be individuals: countability
+
+Not every anatomical class can take a node in such an atlas. The criterion is **countability in
+the idealised organism** — does a normal organism have a determinate number of these?
+
+| | example | atlas node |
+|---|---|---|
+| exactly one | liver, notochord, pharyngeal arch 3 | one individual |
+| an enumerable set | somites 1–39, pharyngeal arches 1–6 | one per index |
+| no determinate count | haemangioblasts, primordial germ cells, blastemal cells | **none** — stays a class |
+
+Countability here means *determinate number*, not *discrete object you could lift out with
+forceps*. There is exactly one `6th arch mesenchyme from neural crest` per embryo, so it is
+countable in the sense that matters, even though it is a mass rather than an object. That
+distinction is not pedantic: §6 measures it, and reading countability as "discrete object" throws
+away nearly half the usable data.
+
+Structures that fail the test are not a problem to be solved. They simply stay class-level, in
+the ordinary OWL, and the atlas says nothing about them.
+
+### What the atlas is for here: timing
+
+An atlas node is a single thing that facts can accumulate on. This work uses that for one
+purpose only: **reasoning about when structures exist, relative to each other and to stages** —
+the gap §1 just described. Everything a structure's timing can be derived from — its own curated
+bounds, its parts', its developmental precursors' — lands on one node instead of being spread
+across unconnected class axioms. §3 states exactly what that buys and how we will know if it
+bought nothing.
+
+Spatial reasoning over an atlas is the obvious neighbouring use and is **not** attempted here.
+
+### Where the individuals come from: macro expansion, not curation
+
+Nothing in the atlas is hand-written. It is **generated from the existing class-level OWL** by
+macro expansion:
+
+```
+class-level OWL              annotation tag            generated atlas
+(Uberon + this repo's    ──  TSA:individuate   ──▶     one individual per tagged
+ curated stage bounds)       marks countable           term per taxon, carrying
+                             terms                     that term's axioms as
+                                                       property assertions
+```
+
+A curator marks a term countable with an **annotation property**; the macro does the rest. This
+matters for three reasons:
+
+- **The OWL stays canonical.** The atlas is a build artefact, regenerated from source every time.
+  There is no second representation to keep in step with the first.
+- **Annotations are invisible to the reasoner.** Tagging a term changes no entailment and
+  survives ROBOT operations, so the flag can live alongside the curation it describes.
+- **The boundary needs no convention.** A relation is expanded into the atlas iff **both** its
+  endpoints are tagged. Everything else is simply not expanded — the class layer and the atlas
+  run in parallel rather than being stitched together at a seam somebody has to define.
+
+§6 covers what gets tagged, §7 the files, §9 the pipeline.
+
+---
+
+## 3. Aims: what this POC tests
+
+§2's atlas is the method. This is the claim it is being used to test, stated so that it can
+fail:
+
+> **Generating an atlas of idealised individuals from the class-level OWL lets timing information
+> that is today spread across unconnected class axioms meet at a single node, and produces
+> structure-to-structure timing that nobody curated.**
 
 Individuation buys exactly three things. All three are unavailable at class level:
 
@@ -108,14 +185,14 @@ is possible in OWL —
 Both are closed-world problems, natural in Datalog — one rule for composition, stratified
 negation for narrowing — and
 [REASONING_STACK.md](https://github.com/dosumis/dev_reasoning_experiments/blob/584150e/REASONING_STACK.md)
-measures that case. **This POC does none of it.** §8 runs HermiT over OWL individuals, which is
+measures that case. **This POC does none of it.** §9 runs HermiT over OWL individuals, which is
 still open-world: it materialises chains and detects contradictions, and that is all. The three
 benefits listed above do not require narrowing, which is why the POC is worth running before
 committing to a Datalog stack. If it succeeds, Soufflé is the next branch, not this one.
 
 ---
 
-## 3. Notation
+## 4. Notation
 
 **Allen interval relations.** Thirteen atomic relations between two intervals, written as single
 letters. Lower case and its upper-case partner are converses of each other:
@@ -142,7 +219,7 @@ to when it ceases; for a stage, the stage itself.
 
 ---
 
-## 4. The modelling
+## 5. The modelling
 
 Three families of relation, each internally type-consistent. No *single* relation has a
 continuant on one side and an occurrent on the other — the C:O family spans the categories by
@@ -204,13 +281,13 @@ Under a later closed-world layer this becomes computable rather than merely perm
 budding(X,Y) :- directly_develops_from(X,Y), not immediate_transformation_of(X,Y).
 ```
 
-— but that is stratified negation, and per §2 it is **not** part of this POC. Here you get the
+— but that is stratified negation, and per §3 it is **not** part of this POC. Here you get the
 honest `dfOM` disjunction and nothing more.
 
 > **This contradicts RO's current definition of RO:0002207, and the POC proceeds anyway.**
 > That definition says `start(x) ≥ end(y)` — Allen `MP` — which mandates the precursor has ended
 > and so forbids the neural-crest case outright. We take the relation to mean what it evidently
-> intends. §13 lists everything RO would have to change for this work to be contributable.
+> intends. §14 lists everything RO would have to change for this work to be contributable.
 
 **Caveat on `dfOM`**: it is *not* in the composition-closed 29-relation subalgebra — it is a
 union, and unions are not generated from the atoms by composition, converse and intersection. So
@@ -219,10 +296,15 @@ true of RO's `preceded_by`.
 
 ---
 
-## 5. What gets individuated
+## 6. What gets individuated
 
-The criterion is **"exactly one per idealised organism"**, *not* "a discrete countable object".
-A located mass qualifies: there is one `6th arch mesenchyme from neural crest` per embryo.
+§2 gave the criterion as countability in the idealised organism. The sharp form is
+**"exactly one per idealised organism"**, *not* "a discrete countable object" — and the
+difference between those two readings is large enough to measure.
+
+A located mass qualifies under the first and fails the second: there is one
+`6th arch mesenchyme from neural crest` per embryo, so it is countable in the sense that
+matters, though you could not lift it out as an object.
 
 Measured over EHDAA2's 2,125 `develops_from` edges with stage bounds on both ends:
 
@@ -262,11 +344,11 @@ because that is all the source has. The staggered onset that makes the somite se
 interesting **is not in Uberon and is not in this repo**, so the individuals would carry no
 information their shared parent did not. Minting them would be machinery without a payload.
 
-Deferred until there is a source for per-index bounds. §12 notes what that would take.
+Deferred until there is a source for per-index bounds. §13 notes what that would take.
 
 ---
 
-## 6. Naming
+## 7. Naming
 
 ### Individual IRIs
 
@@ -305,7 +387,7 @@ needed to argue for filling it. Until then, no OBO IDs are minted.
 
 ---
 
-## 7. Files to add
+## 8. Files to add
 
 ```
 src/timing/relations.ofn          the three C:C relations + subproperty links + chains  (~40 lines)
@@ -338,7 +420,7 @@ SubObjectPropertyOf(obo:RO_0002202 uc:exists_after)               # develops fro
 SubObjectPropertyOf(obo:RO_0002494 uc:exists_after)               # transformation of (M* = MP)
 SubObjectPropertyOf(obo:RO_0002207 uc:exists_directly_after)      # directly develops from *
 SubObjectPropertyOf(obo:RO_0002495 uc:exists_immediately_after)   # immediate transformation of
-# * contradicts RO:0002207's current definition, deliberately -- see 13
+# * contradicts RO:0002207's current definition, deliberately -- see 14
 
 # the two chains
 SubObjectPropertyOf(ObjectPropertyChain(uc:exists_after obo:RO_0002488) obo:RO_0002496)
@@ -356,7 +438,7 @@ operations. Same provenance columns as `src/axioms.tsv`, abbreviated here:
 ```
 uberon_id       uberon_label                         individuate  curator  date        note
 UBERON:0003120  pharyngeal arch artery 3             singleton    dos      2026-10-18  one per embryo
-UBERON:0002329  somite                               excluded     dos      2026-10-18  minted-index, deferred (5)
+UBERON:0002329  somite                               excluded     dos      2026-10-18  minted-index, deferred (6)
 UBERON:0010531  metanephros induced blastemal cells  excluded     dos      2026-10-18  unenumerated population
 ```
 
@@ -375,7 +457,7 @@ UBERON:0003120  UBERON:0003114  RO:0002202   # arch artery 3 develops from arch 
 
 ---
 
-## 8. Pipeline
+## 9. Pipeline
 
 Additive. `build/axioms.ofn` and the contribution package are untouched; delete the targets and
 the repo is as it was.
@@ -436,7 +518,7 @@ what keeps the layer boundary from needing a convention.
 
 ---
 
-## 9. Error checking
+## 10. Error checking
 
 ### The constraint has to live on classes
 
@@ -491,13 +573,13 @@ Both are nearly free if designed in, painful to retrofit.
 
 ---
 
-## 10. First test: the pharyngeal arch system
+## 11. First test: the pharyngeal arch system
 
 23 of the current 176 rows, chosen because:
 
 - **Both endpoints already curated** for arches 1–4, 6 and arteries 1–2
 - **Separately termed and genuinely staggered**, so per-index timing is exercised without needing
-  the deferred minted-index machinery (§5)
+  the deferred minted-index machinery (§6)
 - Covers **both** `offset_type` categories in one series — arteries 1 and 2 regress; 3 → carotid,
   4 → aortic arch/subclavian, 6 → pulmonary/ductus are transformations
 - Nested: artery N `part_of` arch N, pouch N `part_of` arch N
@@ -543,14 +625,14 @@ chains give them one from their arch, the layer has produced something nobody cu
 
 ---
 
-## 11. Deferred
+## 12. Deferred
 
-**Allen composition and narrowing.** The long-run reason for an individual layer; see §2 for why
+**Allen composition and narrowing.** The long-run reason for an individual layer; see §3 for why
 it is out of scope here and what it would need (Soufflé, stratified negation). This POC is partly
 a test of whether that investment is justified.
 
 **Minted-index series.** Somites, and anything else where one Uberon term covers a numbered
-series. Blocked on a source for per-index bounds (§5).
+series. Blocked on a source for per-index bounds (§6).
 
 **The macro stack.** ROBOT + SPARQL, because the convention exists here and costs nothing to
 extend. If string handling becomes the bottleneck: `py-horned-owl` rejects malformed axioms at
@@ -566,23 +648,23 @@ against microseconds for the same universal in SPARQL.
 
 Treat promotion as a **manual diagnostic, not a build target**: run it once on the arch series to
 see whether anything class-level falls out, because that is informative either way. Nothing in
-§10's success criteria depends on it.
+§11's success criteria depends on it.
 
 **Everything that is not developmental anatomy.** Cell-type timing, HP onset, disease
 progression.
 
 ---
 
-## 12. Still open
+## 13. Still open
 
-- **Whether `develops_from` itself should carry `exists_after`.** §4 assumes yes. Measured
+- **Whether `develops_from` itself should carry `exists_after`.** §5 assumes yes. Measured
   against EHDAA2, 18.3% of `develops_from` assertions have the precursor demonstrably still
   present when the product appears, so the weaker `exists_after` holds while `preceded_by` would
   not — but that is one dataset. Note RO *defines* `develops_from` as the transitive closure of
   `directly_develops_from`, so it inherits whatever that is fixed to mean.
 - **Whether the arch series alone is enough to judge.** It exercises the machinery on real data
   but is 23 rows. A second series of different shape would test more — but the obvious candidate,
-  the somites, is blocked on per-index bounds (§5). Identifying a second separately-termed
+  the somites, is blocked on per-index bounds (§6). Identifying a second separately-termed
   staggered series is the cheaper path.
 - **Where per-index bounds could come from** for the minted-index case. Carnegie staging
   literature gives somite counts per stage, which inverts to a per-somite onset; whether that is
@@ -590,7 +672,7 @@ progression.
 
 ---
 
-## 13. What RO would have to change for this to be compatible
+## 14. What RO would have to change for this to be compatible
 
 This is a proof of concept. It asserts things RO currently contradicts, deliberately, to find
 out whether the approach is worth the effort. Nothing here is contributed upstream as it stands.
@@ -604,7 +686,7 @@ evidence in
 | 1 | **Add continuant-to-continuant timing relations.** RO has none at all. | The whole C:C family is minted locally in `uberon/core#` for want of them | 3 new relations |
 | 2 | **Fix the inequality in `directly develops from` (RO:0002207)**: `start(x) ≥ end(y)` → `≤`. | We link it to `exists_directly_after` (`dfOM`); RO's definition says `MP`, the near-opposite, which forbids delamination | 1 definition; relation used **once** in Uberon, never in EHDAA2, already flagged "Candidate definition" |
 | 3 | **Add `starts after`** — the missing converse of `starts before` (RO:0002089). | Needed to state the weakest safe developmental claim at all | 1 relation |
-| 4 | **Declare missing inverses** on `existence starts during`, `existence ends during`, `transformation of`, `immediate transformation of`, `ends after`. | Without them, chains are walkable in one direction only — which is benefit 2 of §2 | 6 axioms |
+| 4 | **Declare missing inverses** on `existence starts during`, `existence ends during`, `transformation of`, `immediate transformation of`, `ends after`. | Without them, chains are walkable in one direction only — which is benefit 2 of §3 | 6 axioms |
 
 ### Two we are living with rather than asking RO to change
 
