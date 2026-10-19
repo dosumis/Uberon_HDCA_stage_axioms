@@ -1,0 +1,9 @@
+a,rel,b,why
+CS23,RO:0002087,CS22,CS23 ipb CS22
+CS22,BFO:0000050,EMB,CS22 part_of embryonic
+CS23,BFO:0000050,EMB,CS23 part_of embryonic
+FET,RO:0002087,EMB,fetal ipb embryonic
+M3,BFO:0000050,FET,month3 part_of fetal
+W9,BFO:0000050,M3,wk9 part_of month3
+W10,BFO:0000050,M3,wk10 part_of month3
+W10,RO:0002087,W9,wk10 ipb wk9

@@ -1,0 +1,29 @@
+# Uberon's structure-to-structure axioms -> edge(x, rel, y, why).
+#
+# Named-to-named only: asserted SubClassOf, and SubClassOf an existential on
+# one of the five relations of docs/timing-individuals.md §3. Datalog decides
+# which of these touch the population; this query does no filtering by it.
+#
+#   robot query --input build/merged-full.owl --query sparql/timing/edge.rq edge.csv
+
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
+
+SELECT DISTINCT ?x ?rel ?y ?why WHERE {
+  {
+    ?xi rdfs:subClassOf ?r .
+    ?r owl:onProperty ?p ; owl:someValuesFrom ?yi .
+    VALUES ?p { obo:RO_0002202 obo:RO_0002207 obo:RO_0002494 obo:RO_0002495 obo:BFO_0000050 }
+    BIND(REPLACE(STR(?p), "^.*/([A-Za-z]+)_", "$1:") AS ?rel)
+  } UNION {
+    ?xi rdfs:subClassOf ?yi .
+    BIND("rdfs:subClassOf" AS ?rel)
+  }
+  FILTER(isIRI(?xi) && isIRI(?yi))
+  FILTER(STRSTARTS(STR(?xi), "http://purl.obolibrary.org/obo/UBERON_"))
+  FILTER(STRSTARTS(STR(?yi), "http://purl.obolibrary.org/obo/UBERON_"))
+  BIND(REPLACE(STR(?xi), "^.*/([A-Za-z]+)_", "$1:") AS ?x)
+  BIND(REPLACE(STR(?yi), "^.*/([A-Za-z]+)_", "$1:") AS ?y)
+  BIND(CONCAT("Uberon: ", ?x, " ", ?rel, " ", ?y) AS ?why)
+}

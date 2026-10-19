@@ -1,0 +1,35 @@
+# Curated stage bounds -> bound(x, pred, stage, why) for datalog/timing.dl.
+#
+# Reads taxon-scoped GCIs by shape, as expand.ru does, so it works on any
+# ontology carrying them -- Uberon included, once these are contributed.
+# `why` names the axiom and who asserted it, so a conflict report shows at a
+# glance whether a sourced row or a latent one is involved.
+#
+#   robot query --input build/axioms.ofn --query sparql/timing/bound.rq bound.csv
+
+PREFIX owl:     <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX obo:     <http://purl.obolibrary.org/obo/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT DISTINCT ?x ?pred ?stage ?why WHERE {
+  ?ax a owl:Axiom ;
+      owl:annotatedSource ?lhs ;
+      owl:annotatedProperty rdfs:subClassOf ;
+      owl:annotatedTarget ?rhs .
+  ?lhs owl:intersectionOf/rdf:rest*/rdf:first ?struct .
+  FILTER(isIRI(?struct))
+  ?lhs owl:intersectionOf/rdf:rest*/rdf:first ?tx .
+  # One taxon per run (docs/timing-individuals.md §4).
+  ?tx owl:onProperty obo:RO_0002162 ; owl:someValuesFrom obo:NCBITaxon_9606 .
+  ?rhs owl:onProperty ?p ; owl:someValuesFrom ?s .
+  VALUES ?p { obo:RO_0002488 obo:RO_0002492 obo:RO_0002491 obo:RO_0002496 obo:RO_0002497 }
+  OPTIONAL { ?ax dcterms:contributor ?curator }
+
+  BIND(REPLACE(STR(?struct), "^.*/([A-Za-z]+)_", "$1:") AS ?x)
+  BIND(REPLACE(STR(?p),      "^.*/([A-Za-z]+)_", "$1:") AS ?pred)
+  BIND(REPLACE(STR(?s),      "^.*/([A-Za-z]+)_", "$1:") AS ?stage)
+  BIND(CONCAT("axioms.tsv: ", ?x, " ", ?pred, " ", ?stage,
+              " [", COALESCE(STR(?curator), "?"), "]") AS ?why)
+}

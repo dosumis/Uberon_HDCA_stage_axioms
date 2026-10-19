@@ -1,0 +1,10 @@
+// Timing of existence, reasoned over start/end points.
+// docs/timing-individuals.md is the specification; semantics.dl is its §3.
+//
+//   souffle -F <facts dir> -D <out dir> datalog/timing.dl
+//   options:  -M RO_2207_AS_DEFINED   read RO:0002207 by RO's current text
+//             -M NO_H1                withhold part_of temporal containment
+
+#include "semantics.dl"
+#include "network.dl"
+#include "report.dl"

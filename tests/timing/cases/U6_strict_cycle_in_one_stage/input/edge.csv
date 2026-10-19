@@ -1,0 +1,3 @@
+x,rel,y,why
+X,RO:0002202,Y,X develops_from Y
+Y,RO:0002202,X,Y develops_from X

@@ -1,0 +1,156 @@
+// Read-only views over network.dl. Nothing here feeds back into reasoning.
+
+.decl label(id: symbol, label: symbol)
+.input label(IO=file, filename="label.csv", delimiter=",", headers=true, rfc4180=true)
+
+.decl has_label(id: symbol)
+has_label(X) :- label(X, _).
+
+.decl name(id: symbol, label: symbol)
+name(X, L) :- label(X, L).
+name(X, X) :- node(X), !has_label(X).
+name(X, X) :- stage(X), !has_label(X).
+
+.decl show(p: Pt, s: symbol)
+show($S(X), cat("start(", L, ")"))  :- name(X, L), node(X).
+show($E(X), cat("end(", L, ")"))    :- name(X, L), node(X).
+show($SS(X), cat("start(", L, ")")) :- name(X, L), stage(X).
+show($SE(X), cat("end(", L, ")"))   :- name(X, L), stage(X).
+
+// ---------------------------------------------------------------- new bounds
+//
+// A bound is new when the structure's own statements -- asserted or inherited
+// at class level, which OWL already gives -- plus s(X) < e(X) do not imply it.
+
+.decl own_lo(p: Pt, s: symbol)
+own_lo($S(X), S) :- bound_on(X, "RO:0002488", S, _).
+own_lo($S(X), S) :- bound_on(X, "RO:0002496", S, _).
+own_lo($S(X), S) :- bound_on(X, "RO:0002491", S, _).
+own_lo($E(X), S) :- bound_on(X, "RO:0002492", S, _).
+own_lo($E(X), S) :- own_lo($S(X), S).
+
+.decl own_up(p: Pt, s: symbol)
+own_up($S(X), S) :- bound_on(X, "RO:0002488", S, _).
+own_up($E(X), S) :- bound_on(X, "RO:0002492", S, _).
+own_up($E(X), S) :- bound_on(X, "RO:0002497", S, _).
+own_up($E(X), S) :- bound_on(X, "RO:0002491", S, _).
+own_up($S(X), S) :- own_up($E(X), S).
+
+// start(L) <= start(S) and end(S) <= end(L), between stages.
+.decl start_le(l: symbol, s: symbol)
+start_le(L, S) :- path($SS(L), $SS(S)).
+start_le(S, S) :- stage(S).
+.decl end_le(s: symbol, l: symbol)
+end_le(S, L) :- path($SE(S), $SE(L)).
+end_le(S, S) :- stage(S).
+
+.decl implied_lo(p: Pt, l: symbol)
+implied_lo(P, L) :- lower(P, L), own_lo(P, S), start_le(L, S).
+
+.decl implied_up(p: Pt, l: symbol)
+implied_up(P, L) :- upper(P, L), own_up(P, S), end_le(S, L).
+
+.decl lower_bound(x: symbol, which: symbol, stage: symbol, status: symbol)
+lower_bound(X, W, L, "implied") :- lower(P, L), spt(P, X, W), implied_lo(P, L).
+lower_bound(X, W, L, "new")     :- lower(P, L), spt(P, X, W), !implied_lo(P, L).
+.output lower_bound(IO=file, filename="lower_bound.csv", delimiter=",", headers=true)
+
+.decl upper_bound(x: symbol, which: symbol, stage: symbol, status: symbol)
+upper_bound(X, W, L, "implied") :- upper(P, L), spt(P, X, W), implied_up(P, L).
+upper_bound(X, W, L, "new")     :- upper(P, L), spt(P, X, W), !implied_up(P, L).
+.output upper_bound(IO=file, filename="upper_bound.csv", delimiter=",", headers=true)
+
+// ---------------------------------------------------------------- conflicts
+
+// One row per pair of bounds that cannot both hold, given the structural path
+// between them. The path itself is in conflict_path.csv.
+.decl conflict(lower: symbol, upper: symbol)
+conflict(W1, W2) :- excursion(_, _, W1, W2).
+.output conflict(IO=file, filename="conflict.csv", delimiter=",", headers=true, rfc4180=true)
+
+.decl conflict_path(lower: symbol, upper: symbol, a: symbol, op: symbol, b: symbol, why: symbol)
+conflict_path(W1, W2, SA, Op, SB, W) :- excursion_edge(W1, W2, A, B, Op, W), show(A, SA), show(B, SB).
+.output conflict_path(IO=file, filename="conflict_path.csv", delimiter=",", headers=true, rfc4180=true)
+
+// The same conflict reached through inheritance repeats once per inheriting
+// subclass. Summarise by the asserted axioms underneath.
+.decl base(why: symbol, asserted: symbol)
+base(W, W) :- bound(_, _, _, W).
+base(W2, W) :- bound(G, _, _, W), anc(M, G), W2 = cat(W, " | inherited by ", M).
+
+.decl conflict_summary(lower: symbol, upper: symbol, copies: number)
+conflict_summary(B1, B2, N) :- conflict(_, _), base(_, B1), base(_, B2),
+    N = count : { conflict(W1, W2), base(W1, B1), base(W2, B2) }, N > 0.
+.output conflict_summary(IO=file, filename="conflict_summary.csv", delimiter=",", headers=true, rfc4180=true)
+
+// Cycles among structures alone, with no stage involved.
+.decl cycle(a: symbol, op: symbol, b: symbol, why: symbol)
+cycle(SA, Op, SB, W) :- cycle_edge(A, B, Op, W), show(A, SA), show(B, SB).
+.output cycle(IO=file, filename="cycle.csv", delimiter=",", headers=true, rfc4180=true)
+
+// Conflicted points neither of the above explains (§6: possible only where
+// the stage frame is not totally ordered). Expected empty; reported if not.
+.decl unexplained_point(p: symbol)
+unexplained_point(SP) :- unexplained(P), show(P, SP).
+.output unexplained_point(IO=file, filename="unexplained.csv", delimiter=",", headers=true, rfc4180=true)
+
+// Structures on an explanation.
+.decl in_conflict(x: symbol)
+in_conflict(X) :- spt(P, X, _), explained(P).
+.output in_conflict(IO=file, filename="in_conflict.csv", delimiter=",", headers=true)
+
+// The axioms the next pass withholds, in withheld.tsv's shape.
+.decl withhold_next(why: symbol, reason: symbol, curator: symbol, date: symbol)
+withhold_next(W, "in a conflict found by the previous pass", "timing", "-") :-
+    culprit(W), !generated(W).
+.output withhold_next(IO=file, filename="withhold_next.tsv", delimiter="\t", headers=true)
+
+// ---------------------------------------------------------------- labelled bounds
+
+.decl bounds_report(x: symbol, structure: symbol, which: symbol,
+                    bound: symbol, stage: symbol, status: symbol)
+bounds_report(X, N, W, "during or after", SN, St) :- lower_bound(X, W, S, St), name(X, N), name(S, SN).
+bounds_report(X, N, W, "during or before", SN, St) :- upper_bound(X, W, S, St), name(X, N), name(S, SN).
+.output bounds_report(IO=file, filename="bounds_report.csv", delimiter=",", headers=true, rfc4180=true)
+
+// ---------------------------------------------------------------- Allen view
+//
+// For each related pair, the Allen atoms whose four endpoint comparisons the
+// closure each permits. Pairwise exact, jointly an over-approximation: an
+// atom can be listed that no single assignment realises.
+
+// allen_atom(atom, s(X)?s(Y), s(X)?e(Y), e(X)?s(Y), e(X)?e(Y))
+.decl allen_atom(r: symbol, ss: symbol, se: symbol, es: symbol, ee: symbol)
+allen_atom("p", "<", "<", "<", "<").
+allen_atom("m", "<", "<", "=", "<").
+allen_atom("o", "<", "<", ">", "<").
+allen_atom("F", "<", "<", ">", "=").
+allen_atom("D", "<", "<", ">", ">").
+allen_atom("s", "=", "<", ">", "<").
+allen_atom("e", "=", "<", ">", "=").
+allen_atom("S", "=", "<", ">", ">").
+allen_atom("d", ">", "<", ">", "<").
+allen_atom("f", ">", "<", ">", "=").
+allen_atom("O", ">", "<", ">", ">").
+allen_atom("M", ">", "=", ">", ">").
+allen_atom("P", ">", ">", ">", ">").
+
+.decl pair(x: symbol, y: symbol)
+pair(X, Y) :- holds(X, _, Y, _), X != Y.
+
+.decl cmp_dom(a: Pt, b: Pt)
+cmp_dom($S(X), $S(Y)) :- pair(X, Y).
+cmp_dom($S(X), $E(Y)) :- pair(X, Y).
+cmp_dom($E(X), $S(Y)) :- pair(X, Y).
+cmp_dom($E(X), $E(Y)) :- pair(X, Y).
+
+.decl cmp_ok(a: Pt, b: Pt, op: symbol)
+cmp_ok(A, B, "<") :- cmp_dom(A, B), !path(B, A).
+cmp_ok(A, B, "=") :- cmp_dom(A, B), !spath(A, B), !spath(B, A).
+cmp_ok(A, B, ">") :- cmp_dom(A, B), !path(A, B).
+
+.decl allen(x: symbol, y: symbol, atom: symbol)
+allen(X, Y, R) :- pair(X, Y), allen_atom(R, A, B, C, D),
+                  cmp_ok($S(X), $S(Y), A), cmp_ok($S(X), $E(Y), B),
+                  cmp_ok($E(X), $S(Y), C), cmp_ok($E(X), $E(Y), D).
+.output allen(IO=file, filename="allen.csv", delimiter=",", headers=true)

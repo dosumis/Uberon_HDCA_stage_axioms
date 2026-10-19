@@ -1,0 +1,19 @@
+# HsapDv's stage relations -> stage_rel(a, rel, b, why).
+#
+#   robot query --input build/hsapdv.owl --query sparql/timing/stage_rel.rq stage_rel.csv
+
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
+
+SELECT DISTINCT ?a ?rel ?b ?why WHERE {
+  ?ai rdfs:subClassOf ?r .
+  ?r owl:onProperty ?p ; owl:someValuesFrom ?bi .
+  VALUES ?p { obo:RO_0002087 obo:BFO_0000062 obo:BFO_0000050 }
+  FILTER(STRSTARTS(STR(?ai), "http://purl.obolibrary.org/obo/HsapDv_"))
+  FILTER(STRSTARTS(STR(?bi), "http://purl.obolibrary.org/obo/HsapDv_"))
+  BIND(REPLACE(STR(?ai), "^.*/([A-Za-z]+)_", "$1:") AS ?a)
+  BIND(REPLACE(STR(?p),  "^.*/([A-Za-z]+)_", "$1:") AS ?rel)
+  BIND(REPLACE(STR(?bi), "^.*/([A-Za-z]+)_", "$1:") AS ?b)
+  BIND(CONCAT("HsapDv: ", ?a, " ", ?rel, " ", ?b) AS ?why)
+}

@@ -1,7 +1,7 @@
 # Plan: reasoning about when structures exist, relative to each other
 
-**Status: draft for discussion. A proof-of-concept implementation lives on the
-`timing-souffle-poc` branch; §10 records what it found.**
+**Status: draft for discussion, with a working proof of concept on the
+`timing-souffle-poc` branch (`make timing`). §10 records what it found.**
 
 > **New to this?** §1 is what this repo does today and what it cannot answer. §2 is the one
 > modelling move everything rests on: treat every structure's existence as two time points.
@@ -126,7 +126,7 @@ The single source of truth. [`datalog/semantics.dl`](../datalog/semantics.dl) tr
 
 ### Structure-to-structure (Uberon)
 
-| relation | Allen (X to Y) | constraint | on non-singleton windows (§4) |
+| relation | Allen (X to Y) | constraint | when Y is not a singleton (§4) |
 |---|---|---|---|
 | X `develops_from` Y (RO:0002202) | `dfOMP` | s(Y) < s(X) | unchanged |
 | X `directly_develops_from` Y (RO:0002207) | `dfOM` | s(Y) < s(X) ≤ e(Y) | unchanged |
@@ -164,20 +164,22 @@ runs from when its first instance starts to when its last instance ends.
 Working each row of §3 through under Uberon's all-some reading: every constraint **except the two
 transformation relations holds exactly on windows**. (Example: if every X develops from some Y,
 then the first X starts after *some* Y started, hence after the first Y started.) The two
-transformations degrade because an equality between one X and one Y does not survive taking
-minima and maxima over many.
+transformations degrade because "each X starts when *some* Y ends" says nothing about when the
+*last* Y ends — unless there is only one Y. So exactness needs only the **precursor** to be a
+singleton; X may be anything.
 
 Consequences:
 
 - **Every term can take part**, not only countable ones. Generic and series terms are sound
   participants; the earlier draft's countability gate, and its measurement of how much data it
   cost, are no longer needed.
-- **The `singleton` tag only buys precision**, and only on transformation edges. It lives in
-  [`src/timing/individuate.tsv`](../src/timing/individuate.tsv). Mis-tagging can only ever
-  over-tighten a transformation constraint; that is the whole of the risk.
-- **Minted-index series** (one Uberon term for 39 somites) need no machinery: the term is a
-  window like any other. Per-somite timing would need per-somite terms and per-somite bounds,
-  which neither Uberon nor this repo has.
+- **The `singleton` tag only buys precision**, and only on transformation edges whose precursor
+  carries it. It lives in [`src/timing/individuate.tsv`](../src/timing/individuate.tsv), empty
+  so far. Mis-tagging can only ever over-tighten a transformation constraint; that is the whole
+  of the risk.
+- **Series need no machinery.** The generic term is a window like any other. Uberon in fact has
+  numbered somite terms (`somite 1` … `somite 30`), and they enter the network as ordinary nodes;
+  what is missing is per-somite *bounds*, which neither Uberon nor this repo has.
 
 ### Which nodes enter
 
@@ -233,28 +235,60 @@ prototype would have to be replaced at EHDAA2 scale anyway.
 ### Closure
 
 `path(a, b)` (a ≤ b entailed) and `spath(a, b)` (a < b entailed) are the transitive closure over
-`le ∪ lt`, with `spath` requiring at least one strict edge. That is the whole reasoner.
+`le ∪ lt`, with `spath` requiring at least one strict edge. That is the whole reasoner. The
+network is inconsistent iff `spath(p, p)` for some point.
 
-- **Conflict:** `spath(p, p)`. A point strictly before itself.
-- **Explanation:** the conflict's support is every edge lying on a cycle through it — every
-  `le`/`lt` edge `a → b` with `path(b, a)` among the conflicted points. Each edge carries its
-  source axiom (a TSV row, a Uberon axiom, an HsapDv axiom), so the report reads "these
-  statements cannot all be true". No proof-tree machinery is required for this; Soufflé's
-  `-t explain` remains available for one-off inspection.
-- **Locality:** a conflict poisons only the points on its cycle; they are flagged in the bound
-  output. Every other bound is supported by a chain of statements that does not pass through it.
+### Explaining a conflict
+
+"Every edge on a cycle through a bad point" is the obvious explanation and, on real data, a
+useless one: cycles through the stage frame share stage points, so unrelated conflicts merge, and
+a structure whose own bounds bridge the same stretch of stages lies on a cycle without being to
+blame. The POC's first real run flagged 101 structures that way.
+
+The explanation that works splits constraints by what they join — *frame* (stage to stage),
+*structural* (structure to structure), *anchor* (a bound) — and looks for **excursions**: an
+anchor puts structure point X at or after stage point Q1, a structural path leads from X to Y,
+an anchor puts Y before Q2, and the frame puts Q2 at or before Q1. A conflict is reported as
+**the two bounds that cannot both hold, plus the structural path between them**. Each
+constraint carries its source axiom (TSV row and curator, Uberon axiom, HsapDv axiom), so it
+reads "these statements cannot all be true".
+
+This is complete when the frame is totally ordered: replace every excursion that does not
+conflict by the frame order it agrees with, and a strict cycle would remain in the frame alone.
+Strict cycles among structures with no stage involved are reported separately. HsapDv's frame is
+only partially ordered, so a conflict needing two excursions together is possible in principle;
+the program reports bad points with no explanation at all rather than hiding them (none so far).
+
+### Passes, and withholding
+
+A conflict that runs through the stage frame collapses part of the frame's order, so bounds
+computed alongside it are unreliable for everything downstream. `make timing` therefore runs in
+passes: pass 1's conflicts are **the conflict report**; each later pass withholds every axiom in
+the previous pass's explanations and reruns, until nothing conflicts. Bounds are read from the
+last pass — a consistent remainder, with what was removed and why listed in that pass's
+`withheld.tsv`.
+
+Withholding is one mechanism with two users: the passes, and
+[`src/timing/withheld.tsv`](../src/timing/withheld.tsv), where a curator withholds an axiom by
+its identity with a reason. Its first entry is an HsapDv error (§10).
 
 ### Bounds
 
-Bounds are reported against the **leaf stages** of HsapDv (stages with no stage parts: CS1–4,
-CS5a–c, CS6a–b, CS7–23, the weeks):
+Bounds are reported against **any** HsapDv stage — a bound on "fetal stage" has no leaf stage to
+land on:
 
-- **lower** — the latest leaf L with start(L) ≤ p entailed ("during or after L");
-- **upper** — the earliest leaf L with p < end(L) entailed ("during or before L");
-- equal lower and upper is "during L".
+- **lower** — S with start(S) ≤ p entailed, and no stage starting strictly later also so
+  ("during or after S");
+- **upper** — S with p < end(S) entailed, and no stage ending strictly earlier also so
+  ("during or before S");
+- stages the frame entails start (or end) together tie and are all reported.
 
-A bound is **new** when the structure's own curated statements, plus s(X) < e(X), do not already
-imply it. Only new bounds count toward H3.
+A bound is **new** when the structure's own statements — asserted, or inherited at class level,
+which OWL already provides — plus s(X) < e(X) do not imply it. Only new bounds count toward H3.
+
+One implementation note, because it cost a factor of a thousand: rules that build a point from
+bound variables (`stage(S), stage(S2), path($SS(S), $SS(S2))`) make Soufflé's interpreter scan
+`path` per pair. Rules iterate `path` and take points apart instead.
 
 ### Allen view
 
@@ -265,10 +299,11 @@ from.
 
 ### Scale
 
-Closure is all-pairs over points: O(n²) space. The POC's network is a few thousand points.
-EHDAA2 scale (~2,000 structures) is tens of millions of tuples — within Soufflé's range;
-partitioning by organ system, or magic-set restriction to the pairs of interest, are the levers
-if it is not.
+Closure is all-pairs over points: O(n²) space. The POC's network is 778 structures and ~300
+stages, 1.1M `path` tuples, closed in under 2 s; a whole pass, reporting included, is ~14 s in
+the interpreter. EHDAA2 scale (~2,000 structures) is tens of millions of tuples — within
+Soufflé's range, compiled (`souffle -c`) if need be; partitioning by organ system, or magic-set
+restriction to the pairs of interest, are the levers beyond that.
 
 ---
 
@@ -277,19 +312,25 @@ if it is not.
 ```
 datalog/semantics.dl  network.dl  report.dl  timing.dl
 sparql/timing/
-  bounds.rq          curated GCIs -> stage-bound facts       (over build/axioms.ofn)
-  population.rq      scoped classes -> node seeds            (over build/scoped.ofn)
-  edges.rq           Uberon named-to-named edges, 5 relations + SubClassOf (over merged-full.owl)
-  stages.rq          HsapDv stage relations                  (over hsapdv.owl)
-  labels.rq          labels, for the report only
-src/timing/individuate.tsv   singleton tags (curated, with provenance columns)
-tests/timing/<case>/         input/*.facts  expected/*.csv     one directory per fixture
-tests/test_timing.py         runs souffle per case and diffs; property test vs oracle
+  bound.rq           curated GCIs -> stage-bound facts       (over build/axioms.ofn)
+  seed.rq            scoped classes -> population            (over build/scoped.ofn)
+  edge.rq            Uberon named-to-named edges, 5 relations + SubClassOf (over merged-full.owl)
+  stage_rel.rq       HsapDv stage relations                  (over build/hsapdv.owl)
+  label.rq           labels, for the report only
+src/timing/individuate.tsv   singleton tags (curated, provenance columns)
+src/timing/withheld.tsv      axioms withheld from every run, each with a reason
+tests/timing/cases/<case>/   input/*  expected/*.csv  [macros]   one directory per fixture
+tests/test_timing.py         runs souffle per fixture and compares row sets
+tests/test_timing_oracle.py  random networks against a brute-force oracle
 ```
 
 Fact export is SPARQL over the artefacts, as with `expand.ru`, so the same step works on GCIs in
-Uberon that this repo did not write. `make timing` needs `build/merged-full.owl` (from
-`make reach`) and fetches HsapDv into `build/`.
+Uberon that this repo did not write. `make facts` needs `build/merged-full.owl` (from
+`make reach`) and fetches HsapDv into `build/`; `make timing` reasons. Outputs, per pass, in
+`build/timing/pass<N>/`: `conflict.csv`, `conflict_summary.csv`, `conflict_path.csv`,
+`cycle.csv`, `unexplained.csv`, `in_conflict.csv`, `lower_bound.csv`, `upper_bound.csv`,
+`bounds_report.csv` (labelled), `allen.csv`, `withhold_next.tsv`. `build/timing/out` is the last
+pass.
 
 ---
 
@@ -301,21 +342,26 @@ Uberon that this repo did not write. `make timing` needs `build/merged-full.owl`
 |---|---|---|
 | U1 | A, B both start during CS11 | consistent; s(A), s(B) unordered; Allen view of A vs B not a single atom |
 | U2 | X `develops_from` Y, both start during CS11 | **consistent** (the integer model got this wrong) |
-| U3 | X starts CS10, Y starts CS12, X `develops_from` Y | conflict; explanation is exactly those 3 statements plus the CS10–CS12 stage edges |
+| U3 | X starts CS10, Y starts CS12, X `develops_from` Y | conflict between the two bounds; path is the `develops_from` edge alone |
 | U4 | X `develops_from` Y, Y starts CS12, X unbounded | s(X) during or after CS12 — new |
 | U5 | X `immediate_transformation_of` Y, Y ends CS14 | singletons: s(X) during CS14. X not tagged: s(X) after start(Y)'s stage, before end(CS14) |
-| U6 | X `develops_from` Y, Y `develops_from` X, both in CS11 | conflict — a strict cycle inside one stage |
+| U6 | X `develops_from` Y, Y `develops_from` X, both in CS11 | a structural cycle, with no stage involved — reported as such |
 | U7 | X `directly_develops_from` Y, Y persists after X starts | consistent by default; conflict with `-M RO_2207_AS_DEFINED` |
 | U8 | G starts during CS12; M `SubClassOf` G, M starts during CS13 | conflict — the inheritance trap |
 | U9 | two independent conflicts and a clean pair | both conflicts reported separately; the clean pair's bounds unaffected |
-| U10 | X ends during or before "fetal stage", Y starts during 9th week | nested coarse stage handled; no conflict; ordering derived through HsapDv part_of |
+| U10 | X starts during week 9, Y starts during CS23, Y `develops_from` X; Z ends during or before "fetal stage" | conflict — CS23 before week 9 is derived only through embryonic/fetal part_of and adjacency; Z's upper bound lands on "fetal stage" itself |
+| U11 | U3, with its `develops_from` edge in `withheld.tsv` | no conflict |
 
 ### Property test
 
-Random small networks (≤ 6 structures, ≤ 4 stages, random relations) checked against a
-brute-force oracle that enumerates orderings. The oracle lives only in `tests/`, shares no code
-with the reasoner, and exists so that a bug in one is unlikely to be mirrored in the other. It
-replaces the earlier draft's 12-minute calibration.
+180 random networks — 120 of two structures, 60 of three, over a three-stage chain, with random
+bounds of all five predicates, random relations of all five kinds and random singleton tags —
+checked against a brute-force oracle. The oracle restates §3 as predicates over integer time and
+tries every placement of every point on a grid fine enough to lose no solution of the dense
+timeline (2n + 1 cells per stage for n structures). It checks consistency both ways, that every
+conflict is explained, and the exact lower and upper stage of every point. It lives only in
+`tests/` and shares no code with the reasoner, so a bug in one is unlikely to be mirrored in the
+other. It replaces the earlier draft's 12-minute calibration.
 
 ### Real data
 
@@ -370,7 +416,69 @@ as GCIs for review, the same shape the table produces.
 
 ## 10. POC results
 
-*To be filled from the `timing-souffle-poc` branch.*
+From `make timing` on the `timing-souffle-poc` branch, 2026-10-19: the 174 live rows, Uberon
+2026-10-01 (`build/merged-full.owl`), HsapDv 2025-01-23. 778 structures enter the network (310
+seeds, closed forward).
+
+### Machinery
+
+All 13 fixtures (§8) give their expected output, and all 180 random networks agree with the
+brute-force oracle on consistency, explanation and exact bounds.
+
+### HsapDv is inconsistent on its own
+
+Before any structure was added, the stage frame alone had a strict cycle: HsapDv asserts
+`Carnegie stage 05a` both `part_of` and `immediately_preceded_by` `Carnegie stage 05`. A part
+cannot begin when its whole ends. The edge — presumably meant to point at CS04 — is in
+`src/timing/withheld.tsv` with that reason, and is to be reported to HsapDv.
+
+### R1 — conflicts
+
+**All four predicted conflicts appear, each with exactly the predicted path.** Six more appear
+that the prototype could not see, because the Datalog follows paths through structures with no
+curated bounds and through class inheritance. Ten distinct conflicts in all (33 rows before
+merging inherited copies), over 40 structures:
+
+| # | bound | vs bound | path | likely culprit |
+|---|---|---|---|---|
+| 1 | NT mantle layer starts CS13 *(sourced)* | NT marginal layer starts CS12 *(sourced)* | marginal `develops_from` mantle | **the Uberon edge** — both bounds are O'Rahilly's |
+| 2 | rhombic lip starts CS16 *(sourced)* | NT marginal layer starts CS12, *inherited by* cerebellum marginal layer | cerebellum `develops_from` rhombic lip; cerebellum marginal layer `part_of` cerebellum | **the inheritance trap**: a point bound on a generic class, false of a late subclass |
+| 3, 4 | neural tube starts CS10 *(sourced)*; posterior neural tube starts CS10 | neural plate starts CS8, *inherited by* hindbrain/midbrain neural plate | neural tube ⊃ posterior/anterior NT ← presumptive hindbrain/midbrain ← hindbrain/midbrain neural plate (`develops_from`) | **Uberon edges run backwards**: neural plate regions made to develop from neural tube regions |
+| 5 | lateral plate mesoderm starts CS8 | amnion starts CS5 | amnion `develops_from` amniotic fold `develops_from` somatopleure `part_of` LPM | **a relation false in human**: the amniotic-fold route is chick and mouse; the human amnion cavitates in the epiblast (§4's taxon assumption) |
+| 6 | lateral plate mesoderm starts CS8 | chorionic villus starts CS6 *(sourced)* | via chorion membrane `develops_from` amniotic fold — same route | same as 5 |
+| 7 | allantois starts CS7 | chorionic villus starts CS6 *(sourced)* | villus `develops_from` chorionic plate `part_of` placental disc `part_of` placenta `develops_from` allantois | the definitive placenta's partonomy applied to primary villi; or what "chorionic villus" covers |
+| 8 | alveolus starts wk36 | lung saccule starts wk24 | saccule `part_of` alveolus | **inverted partonomy**: saccules precede alveoli |
+| 9 | otic pit ends CS12 | otic placode ends CS11 *(sourced)* | pit `part_of` placode | **part_of for a successive stage** (H1) |
+| 10 | neural groove ends CS11 *(sourced)* | neural plate ends CS10 | groove `part_of` plate | the same pattern, or the plate's latent end bound |
+
+Seven of the ten point at Uberon's relations rather than at stage rows, and they are of four
+recognisable kinds: an edge that runs backwards (3, 4, 8), a relation true only in other taxa
+(5, 6), part_of used for a successive stage (9, perhaps 10), and the inheritance trap (2).
+
+### R2 — new bounds
+
+**Every predicted bound appears**: arch arteries 3, 4, 6 end during or before CS17; pancreas
+primordium starts during CS12; the generic pharyngeal arch starts during CS10; the generic arch
+artery's end tightens from CS20 to CS17.
+
+Over everything: 746 new bound rows on 344 structures — 24 curated structures tightened, 75
+uncurated structures in the population, 245 structures reached forward from it. Most are
+one-sided. They come from pass 2, which withheld the 91 axioms in pass 1's conflicts, so
+structures in those families get weaker bounds than they would once the conflicts are resolved.
+
+### H1 carries most of it
+
+Rerun with part_of containment withheld (`-M NO_H1`): **2 distinct conflicts instead of 10**
+(1 and 4 survive), and 246 new bound rows instead of 746. Containment is behind most of the
+error-finding and most of the bounds — and also behind three of the conflicts where part_of
+itself is the suspect (8, 9, 10). It is the hypothesis to test hardest.
+
+`-M RO_2207_AS_DEFINED` changes nothing here: Uberon uses `directly_develops_from` once, outside
+the population.
+
+### Not yet run
+
+**R3, leave-one-out**, and EHDAA2. Both are next; neither needs new rules.
 
 ---
 

@@ -1,0 +1,16 @@
+# Scoped classes -> seed(x): the population of docs/timing-individuals.md §4.
+#
+#   robot query --input build/scoped.ofn --query sparql/timing/seed.rq seed.csv
+
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+
+SELECT DISTINCT ?x WHERE {
+  ?gen owl:equivalentClass ?lhs .
+  ?lhs owl:intersectionOf/rdf:rest*/rdf:first ?struct .
+  FILTER(isIRI(?struct))
+  ?lhs owl:intersectionOf/rdf:rest*/rdf:first ?tx .
+  ?tx owl:onProperty obo:RO_0002162 ; owl:someValuesFrom obo:NCBITaxon_9606 .
+  BIND(REPLACE(STR(?struct), "^.*/([A-Za-z]+)_", "$1:") AS ?x)
+}

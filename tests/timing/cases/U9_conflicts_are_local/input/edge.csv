@@ -1,0 +1,6 @@
+x,rel,y,why
+A,RO:0002202,B,A develops_from B
+B,RO:0002202,A,B develops_from A
+C,RO:0002202,D,C develops_from D
+D,RO:0002202,C,D develops_from C
+E,RO:0002202,F,E develops_from F

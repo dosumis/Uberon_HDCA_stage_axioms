@@ -1,0 +1,12 @@
+# Labels, for the report only. Run over each input ontology; outputs are merged.
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?id ?label WHERE {
+  ?c rdfs:label ?l .
+  FILTER(isIRI(?c))
+  FILTER(STRSTARTS(STR(?c), "http://purl.obolibrary.org/obo/UBERON_") ||
+         STRSTARTS(STR(?c), "http://purl.obolibrary.org/obo/HsapDv_"))
+  BIND(REPLACE(STR(?c), "^.*/([A-Za-z]+)_", "$1:") AS ?id)
+  BIND(STR(?l) AS ?label)
+}

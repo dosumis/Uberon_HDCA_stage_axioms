@@ -1,0 +1,5 @@
+x,pred,stage,why
+A,RO:0002488,CS11,A starts CS11
+B,RO:0002488,CS11,B starts CS11
+A,RO:0002492,CS12,A ends CS12
+B,RO:0002492,CS14,B ends CS14

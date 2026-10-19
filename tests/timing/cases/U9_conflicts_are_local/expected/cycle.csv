@@ -1,0 +1,5 @@
+a,op,b,why
+start(B),<,start(A),A develops_from B
+start(A),<,start(B),B develops_from A
+start(D),<,start(C),C develops_from D
+start(C),<,start(D),D develops_from C

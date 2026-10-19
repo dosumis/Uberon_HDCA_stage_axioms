@@ -1,0 +1,2 @@
+why	reason	curator	date
+HsapDv: HsapDv:0000031 RO:0002087 HsapDv:0000009	Carnegie stage 05a is asserted part_of Carnegie stage 05 and also immediately_preceded_by it; a part cannot start when its whole ends, so HsapDv is inconsistent on its own. Presumably meant CS04. To report to HsapDv.	dos	2026-10-19

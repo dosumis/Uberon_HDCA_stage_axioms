@@ -1,0 +1,176 @@
+// The semantics table of docs/timing-individuals.md §3, one rule per row.
+//
+// Every relation becomes a constraint between time points:
+//   le(a, b, why)   a <= b
+//   lt(a, b, why)   a <  b
+// `why` names the asserted axiom the constraint came from, so a conflict can
+// be reported against what a curator wrote rather than against a point.
+//
+// This file draws no conclusions. It only translates. network.dl reasons.
+
+// ---------------------------------------------------------------- points
+
+// S/E: start and end of a structure's existence window (§4).
+// SS/SE: start and end of a stage.
+.type Pt = S {x: symbol} | E {x: symbol} | SS {x: symbol} | SE {x: symbol}
+
+// ---------------------------------------------------------------- inputs
+// All produced by sparql/timing/*.rq except individuate, which is curated.
+
+.decl bound_in(x: symbol, pred: symbol, stage: symbol, why: symbol)
+.input bound_in(IO=file, filename="bound.csv", delimiter=",", headers=true, rfc4180=true)
+
+.decl edge_in(x: symbol, rel: symbol, y: symbol, why: symbol)
+.input edge_in(IO=file, filename="edge.csv", delimiter=",", headers=true, rfc4180=true)
+
+.decl stage_rel_in(a: symbol, rel: symbol, b: symbol, why: symbol)
+.input stage_rel_in(IO=file, filename="stage_rel.csv", delimiter=",", headers=true, rfc4180=true)
+
+// Axioms deliberately left out of a run, each with its reason
+// (src/timing/withheld.tsv). Matched on `why`, the axiom's own identity.
+.decl withheld(why: symbol, reason: symbol, curator: symbol, date: symbol)
+.input withheld(IO=file, filename="withheld.tsv", delimiter="\t", headers=true)
+
+.decl is_withheld(why: symbol)
+is_withheld(W) :- withheld(W, _, _, _).
+
+.decl bound(x: symbol, pred: symbol, stage: symbol, why: symbol)
+bound(X, P, S, W) :- bound_in(X, P, S, W), !is_withheld(W).
+
+.decl edge(x: symbol, rel: symbol, y: symbol, why: symbol)
+edge(X, R, Y, W) :- edge_in(X, R, Y, W), !is_withheld(W).
+
+.decl stage_rel(a: symbol, rel: symbol, b: symbol, why: symbol)
+stage_rel(A, R, B, W) :- stage_rel_in(A, R, B, W), !is_withheld(W).
+
+.decl seed(x: symbol)
+.input seed(IO=file, filename="seed.csv", delimiter=",", headers=true, rfc4180=true)
+
+.decl individuate(uberon_id: symbol, uberon_label: symbol, kind: symbol,
+                  curator: symbol, date: symbol, note: symbol)
+.input individuate(IO=file, filename="individuate.tsv", delimiter="\t", headers=true)
+
+.decl singleton(x: symbol)
+singleton(X) :- individuate(X, _, "singleton", _, _, _).
+
+// ---------------------------------------------------------------- nodes (§4)
+
+// The relations that relate one structure's window to another's.
+.decl struct_rel(rel: symbol)
+struct_rel("RO:0002202").   // develops from
+struct_rel("RO:0002207").   // directly develops from
+struct_rel("RO:0002494").   // transformation of
+struct_rel("RO:0002495").   // immediate transformation of
+struct_rel("BFO:0000050").  // part of
+
+.decl node(x: symbol)
+node(X) :- seed(X).
+node(X) :- bound(X, _, _, _).
+// Closed forward only: an instance of X in this taxon implies an instance of
+// any Y it is related to, so Y belongs. Nothing is pulled in backwards.
+node(Y) :- holds(_, _, Y, _).
+node(G) :- anc(_, G).
+
+// anc(M, G): M is a (reflexive-free) subclass of G.
+.decl anc(m: symbol, g: symbol)
+anc(M, G) :- node(M), edge(M, "rdfs:subClassOf", G, _).
+anc(M, H) :- anc(M, G), edge(G, "rdfs:subClassOf", H, _).
+
+// Class axioms are inherited (§3): a bound or relation asserted on G holds
+// of every subclass M. Provenance keeps the original axiom.
+.decl bound_on(x: symbol, pred: symbol, stage: symbol, why: symbol)
+bound_on(X, P, S, W) :- bound(X, P, S, W), node(X).
+bound_on(M, P, S, W2) :- anc(M, G), bound(G, P, S, W),
+    W2 = cat(W, " | inherited by ", M), !is_withheld(W2).
+
+.decl holds(x: symbol, rel: symbol, y: symbol, why: symbol)
+holds(X, R, Y, W) :- node(X), edge(X, R, Y, W), struct_rel(R).
+holds(M, R, Y, W2) :- anc(M, G), edge(G, R, Y, W), struct_rel(R),
+    W2 = cat(W, " | inherited by ", M), !is_withheld(W2).
+
+.decl stage(s: symbol)
+stage(S) :- stage_rel(S, _, _, _).
+stage(S) :- stage_rel(_, _, S, _).
+stage(S) :- bound(_, _, S, _).
+
+.decl le(a: Pt, b: Pt, why: symbol)
+.decl lt(a: Pt, b: Pt, why: symbol)
+
+// ================================================================ the table
+
+// ---- stage relations (HsapDv) ----
+
+// every stage S:  start(S) < end(S)
+lt($SS(S), $SE(S), cat("stage ", S)) :- stage(S).
+
+// A immediately_preceded_by B:  end(B) = start(A)
+le($SE(B), $SS(A), W) :- stage_rel(A, "RO:0002087", B, W).
+le($SS(A), $SE(B), W) :- stage_rel(A, "RO:0002087", B, W).
+
+// A preceded_by B:  end(B) <= start(A)
+le($SE(B), $SS(A), W) :- stage_rel(A, "BFO:0000062", B, W).
+
+// A part_of B:  start(B) <= start(A),  end(A) <= end(B)
+le($SS(B), $SS(A), W) :- stage_rel(A, "BFO:0000050", B, W).
+le($SE(A), $SE(B), W) :- stage_rel(A, "BFO:0000050", B, W).
+
+// ---- structure-to-stage ----
+
+// every structure X:  s(X) < e(X)
+lt($S(X), $E(X), cat("exists ", X)) :- node(X).
+
+// starts during S (RO:0002488):  start(S) <= s(X) < end(S)
+le($SS(S), $S(X), W) :- bound_on(X, "RO:0002488", S, W).
+lt($S(X), $SE(S), W) :- bound_on(X, "RO:0002488", S, W).
+
+// starts during or after S (RO:0002496):  start(S) <= s(X)
+le($SS(S), $S(X), W) :- bound_on(X, "RO:0002496", S, W).
+
+// ends during S (RO:0002492):  start(S) <= e(X) < end(S)
+le($SS(S), $E(X), W) :- bound_on(X, "RO:0002492", S, W).
+lt($E(X), $SE(S), W) :- bound_on(X, "RO:0002492", S, W).
+
+// ends during or before S (RO:0002497):  e(X) < end(S)
+lt($E(X), $SE(S), W) :- bound_on(X, "RO:0002497", S, W).
+
+// exists during S (RO:0002491):  start(S) <= s(X),  e(X) <= end(S)
+le($SS(S), $S(X), W) :- bound_on(X, "RO:0002491", S, W).
+le($E(X), $SE(S), W) :- bound_on(X, "RO:0002491", S, W).
+
+// ---- structure-to-structure ----
+
+// X develops_from Y (RO:0002202), dfOMP:  s(Y) < s(X)
+lt($S(Y), $S(X), W) :- holds(X, "RO:0002202", Y, W).
+
+// X directly_develops_from Y (RO:0002207), dfOM:  s(Y) < s(X) <= e(Y)
+// With -M RO_2207_AS_DEFINED, RO's current text instead:  e(Y) <= s(X)  (§11)
+#ifdef RO_2207_AS_DEFINED
+le($E(Y), $S(X), W) :- holds(X, "RO:0002207", Y, W).
+#else
+lt($S(Y), $S(X), W) :- holds(X, "RO:0002207", Y, W).
+le($S(X), $E(Y), W) :- holds(X, "RO:0002207", Y, W).
+#endif
+
+// X transformation_of Y (RO:0002494), MP:  e(Y) <= s(X)
+//   exact only when the precursor Y is a singleton; otherwise s(Y) < s(X)
+le($E(Y), $S(X), W) :- holds(X, "RO:0002494", Y, W), singleton(Y).
+lt($S(Y), $S(X), W) :- holds(X, "RO:0002494", Y, W), !singleton(Y).
+
+// X immediate_transformation_of Y (RO:0002495), M:  e(Y) = s(X)
+//   exact only when Y is a singleton; otherwise s(Y) < s(X) <= e(Y)
+le($E(Y), $S(X), W) :- holds(X, "RO:0002495", Y, W), singleton(Y).
+le($S(X), $E(Y), W) :- holds(X, "RO:0002495", Y, W).
+lt($S(Y), $S(X), W) :- holds(X, "RO:0002495", Y, W), !singleton(Y).
+
+// X part_of Y (BFO:0000050) -- hypothesis H1, temporal containment:
+//   s(Y) <= s(X),  e(X) <= e(Y)
+// With -M NO_H1 the rule is withheld, to measure what depends on it.
+#ifndef NO_H1
+le($S(Y), $S(X), W) :- holds(X, "BFO:0000050", Y, W).
+le($E(X), $E(Y), W) :- holds(X, "BFO:0000050", Y, W).
+#endif
+
+// X SubClassOf Y: X's window lies within Y's.  s(Y) <= s(X),  e(X) <= e(Y)
+// Asserted edges only; the closure supplies transitivity.
+le($S(Y), $S(X), W) :- node(X), edge(X, "rdfs:subClassOf", Y, W).
+le($E(X), $E(Y), W) :- node(X), edge(X, "rdfs:subClassOf", Y, W).

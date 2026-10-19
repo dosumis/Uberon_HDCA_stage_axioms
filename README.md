@@ -59,8 +59,11 @@ schema/                 axioms.schema.json, evidence.schema.json
 sparql/expand.ru        GCI left-hand side -> named class
 sparql/checks/          monotonicity, unexpanded-GCI
 sparql/extract.rq       materialised bounds back out as a table
+sparql/timing/           fact export for the timing reasoner
+datalog/                timing of existence between structures (Soufflé); docs/timing-individuals.md
+src/timing/             curated inputs to it: singleton tags, withheld axioms
 contribution/           what would go to Uberon: sourced GCIs + a review table
-docs/                   open design questions, currently end bounds
+docs/                   design: end bounds, timing between structures
 tickets/                drafted Uberon new-term requests
 .claude/skills/         stage-evidence (source corpus + verifier), wiki fetch
 .claude/hooks/          the Write/Edit gate that enforces the verifier
@@ -76,6 +79,7 @@ make scoped     expand GCIs, scope the terms that can inherit
 make materialize round trip with no Uberon                (ROBOT only)
 make reach      the real run                              (needs UBERON=, UBERON_OBO=)
 make contribute package the sourced axioms
+make timing     conflicts and bounds between structures  (needs merged-full.owl, souffle)
 make test
 ```
 

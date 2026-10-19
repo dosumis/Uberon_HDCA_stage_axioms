@@ -1,0 +1,220 @@
+// The reasoner: transitive closure over the constraints semantics.dl emits.
+//
+// For a network of <=, < and = between points this closure is complete
+// (docs/timing-individuals.md §2): the network is inconsistent iff some point
+// is strictly before itself, and every bound below is the tightest the
+// asserted statements entail. There is nothing else here.
+
+// ---------------------------------------------------------------- closure
+
+// path(a, b):  a <= b is entailed.   spath(a, b):  a < b is entailed.
+.decl path(a: Pt, b: Pt)
+.decl spath(a: Pt, b: Pt)
+
+path(A, B) :- le(A, B, _).
+path(A, B) :- lt(A, B, _).
+path(A, C) :- path(A, B), le(B, C, _).
+path(A, C) :- path(A, B), lt(B, C, _).
+
+spath(A, B) :- lt(A, B, _).
+spath(A, C) :- spath(A, B), le(B, C, _).
+spath(A, C) :- spath(A, B), lt(B, C, _).
+spath(A, C) :- path(A, B), lt(B, C, _).
+
+// ---------------------------------------------------------------- conflicts
+
+// A point strictly before itself: the statements on its cycle cannot all hold.
+.decl bad(p: Pt)
+bad(P) :- spath(P, P).
+
+// Explaining a conflict. Cycles through the stage frame share stage points, so
+// "everything on a cycle through a bad point" merges unrelated conflicts into
+// one. Instead, split each constraint by what it joins:
+//
+//   frame       stage point to stage point     (HsapDv)
+//   structural  structure point to structure point
+//   anchor      a bound: stage point to structure point, or back
+//
+// A conflict is then, in the common case, an *excursion*: an anchor puts
+// structure point X at or after stage point Q1, a structural path leads from
+// X to Y, an anchor puts Y before stage point Q2, and the frame puts Q2 at or
+// before Q1. Its explanation is the two bounds and the structural path between
+// them. With a totally ordered frame every conflict is either an excursion or
+// a cycle inside the structural graph; HsapDv's frame is only partially
+// ordered, so any bad point neither explains is reported as unexplained.
+
+.decl stpt(p: Pt)
+stpt($SS(S)) :- stage(S).
+stpt($SE(S)) :- stage(S).
+
+.decl spt0(p: Pt)
+spt0($S(X)) :- node(X).
+spt0($E(X)) :- node(X).
+
+// frame closure
+.decl f_le(a: Pt, b: Pt)
+f_le(A, B) :- le(A, B, _), stpt(A), stpt(B).
+.decl f_lt(a: Pt, b: Pt)
+f_lt(A, B) :- lt(A, B, _), stpt(A), stpt(B).
+.decl fpath(a: Pt, b: Pt)
+fpath(A, B) :- f_le(A, B).
+fpath(A, B) :- f_lt(A, B).
+fpath(A, C) :- fpath(A, B), f_le(B, C).
+fpath(A, C) :- fpath(A, B), f_lt(B, C).
+.decl fspath(a: Pt, b: Pt)
+fspath(A, B) :- f_lt(A, B).
+fspath(A, C) :- fspath(A, B), f_le(B, C).
+fspath(A, C) :- fspath(A, B), f_lt(B, C).
+fspath(A, C) :- fpath(A, B), f_lt(B, C).
+
+// structural closure
+.decl s_le(a: Pt, b: Pt, why: symbol)
+s_le(A, B, W) :- le(A, B, W), spt0(A), spt0(B).
+.decl s_lt(a: Pt, b: Pt, why: symbol)
+s_lt(A, B, W) :- lt(A, B, W), spt0(A), spt0(B).
+.decl xpath(a: Pt, b: Pt)
+xpath(A, B) :- s_le(A, B, _).
+xpath(A, B) :- s_lt(A, B, _).
+xpath(A, C) :- xpath(A, B), s_le(B, C, _).
+xpath(A, C) :- xpath(A, B), s_lt(B, C, _).
+.decl xspath(a: Pt, b: Pt)
+xspath(A, B) :- s_lt(A, B, _).
+xspath(A, C) :- xspath(A, B), s_le(B, C, _).
+xspath(A, C) :- xspath(A, B), s_lt(B, C, _).
+xspath(A, C) :- xpath(A, B), s_lt(B, C, _).
+
+// reach(X, Y, strict): Y is X, or reachable from it structurally.
+.decl reach(x: Pt, y: Pt, strict: number)
+reach(X, X, 0) :- spt0(X).
+reach(X, Y, 0) :- xpath(X, Y).
+reach(X, Y, 1) :- xspath(X, Y).
+
+// anchors: lo(X, Q, why, strict) is Q <= X (or <); hi(Y, Q, ...) is Y <= Q (or <).
+.decl anchor_lo(x: Pt, q: Pt, why: symbol, strict: number)
+anchor_lo(X, Q, W, 0) :- le(Q, X, W), stpt(Q), spt0(X).
+anchor_lo(X, Q, W, 1) :- lt(Q, X, W), stpt(Q), spt0(X).
+.decl anchor_hi(y: Pt, q: Pt, why: symbol, strict: number)
+anchor_hi(Y, Q, W, 0) :- le(Y, Q, W), stpt(Q), spt0(Y).
+anchor_hi(Y, Q, W, 1) :- lt(Y, Q, W), stpt(Q), spt0(Y).
+
+// frame(A, B, strict): B is A, or the frame entails A <= B (or A < B).
+.decl frame(a: Pt, b: Pt, strict: number)
+frame(Q, Q, 0) :- stpt(Q).
+frame(A, B, 0) :- fpath(A, B).
+frame(A, B, 1) :- fspath(A, B).
+
+// The excursion: Q1 <= X ~> Y <= Q2 <= Q1, strict somewhere.
+.decl excursion(x: Pt, y: Pt, lo_why: symbol, hi_why: symbol)
+excursion(X, Y, W1, W2) :-
+    anchor_lo(X, Q1, W1, S1), reach(X, Y, S), anchor_hi(Y, Q2, W2, S2),
+    frame(Q2, Q1, F), S1 + S + S2 + F > 0.
+
+// Its support: structural constraints on some path from X to Y.
+.decl excursion_edge(lo_why: symbol, hi_why: symbol, a: Pt, b: Pt, op: symbol, why: symbol)
+excursion_edge(W1, W2, A, B, "<=", W) :- excursion(X, Y, W1, W2), s_le(A, B, W),
+    reach(X, A, _), reach(B, Y, _).
+excursion_edge(W1, W2, A, B, "<", W) :- excursion(X, Y, W1, W2), s_lt(A, B, W),
+    reach(X, A, _), reach(B, Y, _).
+
+// A cycle inside the structural graph alone, with its support.
+.decl xbad(p: Pt)
+xbad(P) :- xspath(P, P).
+.decl cycle_edge(a: Pt, b: Pt, op: symbol, why: symbol)
+cycle_edge(A, B, "<=", W) :- s_le(A, B, W), xbad(A), xbad(B), xpath(B, A).
+cycle_edge(A, B, "<", W)  :- s_lt(A, B, W), xbad(A), xbad(B), xpath(B, A).
+
+// A point can be bad without being to blame: one whose own bounds bridge a
+// stretch of stages that some conflict's cycle also crosses lies on a cycle
+// too. The structures to blame are those on an explanation.
+.decl explained(p: Pt)
+explained(P) :- excursion(X, Y, _, _), reach(X, P, _), reach(P, Y, _).
+explained(P) :- xbad(P).
+
+// With a totally ordered frame, every strict cycle through a stage contains an
+// excursion that conflicts on its own: replace each excursion that does not by
+// the frame order it agrees with, and the frame itself would be inconsistent.
+// So bad points with no explanation at all can only come from a partially
+// ordered frame, needing two excursions together. Reported, not hidden.
+.decl any_explanation()
+any_explanation() :- excursion(_, _, _, _).
+any_explanation() :- xbad(_).
+.decl unexplained(p: Pt)
+unexplained(P) :- bad(P), spt0(P), !any_explanation().
+
+// Every asserted axiom in an explanation. The next pass withholds them all,
+// so bounds are computed from a consistent remainder (Makefile, `timing`).
+// Generated constraints (s < e, stage start < end) are not axioms anyone wrote.
+.decl culprit(why: symbol)
+culprit(W) :- excursion(_, _, W, _).
+culprit(W) :- excursion(_, _, _, W).
+culprit(W) :- excursion_edge(_, _, _, _, _, W).
+culprit(W) :- cycle_edge(_, _, _, W).
+
+.decl generated(why: symbol)
+generated(W) :- culprit(W), substr(W, 0, 7) = "exists ".
+generated(W) :- culprit(W), substr(W, 0, 6) = "stage ".
+
+// ---------------------------------------------------------------- bounds
+
+// A structure's two points, and which is which. Reported for the structures a
+// curator would recognise -- the seeds, anything curated, anything a relation
+// points at -- not for the superclass windows that exist only as machinery.
+.decl reported(x: symbol)
+reported(X) :- seed(X).
+reported(X) :- bound(X, _, _, _).
+reported(Y) :- holds(_, _, Y, _).
+
+.decl spt(p: Pt, x: symbol, which: symbol)
+spt($S(X), X, "start") :- node(X).
+spt($E(X), X, "end")   :- node(X).
+
+.decl rpt(p: Pt)
+rpt(P) :- spt(P, X, _), reported(X).
+
+// (Rules here iterate path and take points apart, rather than building a
+// point from bound variables: the latter makes the interpreter scan path once
+// per pair, which is the difference between seconds and hours.)
+
+// The entailed order on stage starts and on stage ends. S2 starts later than S
+// when start(S) <= start(S2) is entailed and the converse is not; stages
+// entailed to start together are tied, not ordered.
+.decl starts_later(s: symbol, s2: symbol)
+starts_later(S, S2) :- path($SS(S), $SS(S2)), !path($SS(S2), $SS(S)).
+
+.decl ends_earlier(s: symbol, s2: symbol)
+ends_earlier(S, S2) :- path($SE(S2), $SE(S)), !path($SE(S), $SE(S2)).
+
+// The covering pairs of those orders: nothing strictly between. If any
+// later-starting stage is a candidate for a point, a covering one is too, so
+// comparing against covers alone finds every beaten candidate.
+.decl starts_between(s: symbol, s2: symbol)
+starts_between(S, S2) :- starts_later(S, S3), starts_later(S3, S2).
+.decl starts_next(s: symbol, s2: symbol)
+starts_next(S, S2) :- starts_later(S, S2), !starts_between(S, S2).
+
+.decl ends_between(s: symbol, s2: symbol)
+ends_between(S, S2) :- ends_earlier(S, S3), ends_earlier(S3, S2).
+.decl ends_next(s: symbol, s2: symbol)
+ends_next(S, S2) :- ends_earlier(S, S2), !ends_between(S, S2).
+
+// lower(p, S): S has start(S) <= p entailed, and no later-starting stage does.
+// Ties are all reported. Any stage counts, not only leaves -- a bound on
+// "fetal stage" has no leaf to land on.
+.decl lo_cand(p: Pt, s: symbol)
+lo_cand(P, S) :- path($SS(S), P), rpt(P).
+
+.decl lo_beaten(p: Pt, s: symbol)
+lo_beaten(P, S) :- lo_cand(P, S), starts_next(S, S2), lo_cand(P, S2).
+
+.decl lower(p: Pt, s: symbol)
+lower(P, S) :- lo_cand(P, S), !lo_beaten(P, S).
+
+// upper(p, S): S has p < end(S) entailed, and no earlier-ending stage does.
+.decl up_cand(p: Pt, s: symbol)
+up_cand(P, S) :- spath(P, $SE(S)), rpt(P).
+
+.decl up_beaten(p: Pt, s: symbol)
+up_beaten(P, S) :- up_cand(P, S), ends_next(S, S2), up_cand(P, S2).
+
+.decl upper(p: Pt, s: symbol)
+upper(P, S) :- up_cand(P, S), !up_beaten(P, S).
