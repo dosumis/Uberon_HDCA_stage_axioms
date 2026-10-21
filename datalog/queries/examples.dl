@@ -1,0 +1,81 @@
+// Example timing queries over the network. Read-only: they use path/spath
+// (entailed <= and <) and the relations semantics.dl builds; they add nothing
+// to the reasoning.
+//
+//   souffle -F build/timing/pass2-facts -D build/timing/queries datalog/queries/examples.dl
+//
+// Run over the last pass's facts, so the network is consistent. Change the
+// ask_* facts below to ask about other structures or stages.
+
+#include "../timing.dl"
+
+// Which point of a structure is which, for queries.
+#define START(X) $S(X)
+#define END(X)   $E(X)
+
+// ---------------------------------------------------------------- 1
+// What exists during a stage? "Certainly" means every model has the
+// structure's lifetime overlapping the stage; "possibly" means some model does.
+
+.decl ask_stage(s: symbol)
+ask_stage("HsapDv:0000019").   // Carnegie stage 12
+
+.decl present_during(stage: symbol, x: symbol, structure: symbol, certainty: symbol)
+present_during(SL, X, N, "certainly") :- ask_stage(S), name(S, SL), reported(X), name(X, N),
+    spath(START(X), $SE(S)), spath($SS(S), END(X)).
+present_during(SL, X, N, "possibly") :- ask_stage(S), name(S, SL), reported(X), name(X, N),
+    !path(END(X), $SS(S)), !path($SE(S), START(X)),
+    !(spath(START(X), $SE(S)), spath($SS(S), END(X))).
+.output present_during(IO=file, filename="present_during.csv", delimiter=",", headers=true, rfc4180=true)
+
+// ---------------------------------------------------------------- 2
+// What must already have started when a structure starts?
+
+.decl ask_structure(x: symbol)
+ask_structure("UBERON:0000081").   // metanephros
+
+.decl started_before(structure: symbol, earlier: symbol)
+started_before(N, NY) :- ask_structure(X), name(X, N), reported(Y), Y != X, name(Y, NY),
+    spath(START(Y), START(X)).
+.output started_before(IO=file, filename="started_before.csv", delimiter=",", headers=true, rfc4180=true)
+
+// ---------------------------------------------------------------- 3
+// Could two structures ever coexist? "never" if one is entailed to end before
+// the other starts; "always" if they are entailed to overlap.
+
+.decl ask_pair(a: symbol, b: symbol)
+ask_pair("UBERON:0004141", "UBERON:0004154").   // heart tube, atrial septum primum
+ask_pair("UBERON:0003064", "UBERON:0000080").   // intermediate mesoderm, mesonephros
+ask_pair("UBERON:0005062", "UBERON:0001049").   // neural fold, neural tube
+ask_pair("UBERON:0004128", "UBERON:0003072").   // optic vesicle, optic cup
+
+.decl coexist(a: symbol, b: symbol, answer: symbol)
+coexist(NA, NB, "never") :- ask_pair(A, B), name(A, NA), name(B, NB),
+    (path(END(A), START(B)) ; path(END(B), START(A))).
+coexist(NA, NB, "certainly") :- ask_pair(A, B), name(A, NA), name(B, NB),
+    spath(START(A), END(B)), spath(START(B), END(A)).
+coexist(NA, NB, "unknown") :- ask_pair(A, B), name(A, NA), name(B, NB),
+    !path(END(A), START(B)), !path(END(B), START(A)),
+    !(spath(START(A), END(B)), spath(START(B), END(A))).
+.output coexist(IO=file, filename="coexist.csv", delimiter=",", headers=true, rfc4180=true)
+
+// ---------------------------------------------------------------- 4
+// What develops, directly or not, from a structure -- the inverse walk the
+// class level cannot do -- and when each derivative can start.
+
+.decl ask_precursor(y: symbol)
+ask_precursor("UBERON:0003064").   // intermediate mesoderm
+
+.decl derives(x: symbol, y: symbol)
+derives(X, Y) :- holds(X, R, Y, _), (R = "RO:0002202" ; R = "RO:0002207" ;
+                                     R = "RO:0002494" ; R = "RO:0002495").
+derives(X, Z) :- derives(X, Y), derives(Y, Z).
+
+.decl derivative(precursor: symbol, derivative: symbol, starts_after: symbol, starts_before: symbol)
+derivative(NY, NX, LoN, UpN) :- ask_precursor(Y), name(Y, NY), derives(X, Y), name(X, NX),
+    lower(START(X), Lo), name(Lo, LoN), upper(START(X), Up), name(Up, UpN).
+derivative(NY, NX, LoN, "-") :- ask_precursor(Y), name(Y, NY), derives(X, Y), name(X, NX),
+    lower(START(X), Lo), name(Lo, LoN), !has_upper(START(X)).
+.decl has_upper(p: Pt)
+has_upper(P) :- upper(P, _).
+.output derivative(IO=file, filename="derivative.csv", delimiter=",", headers=true, rfc4180=true)
