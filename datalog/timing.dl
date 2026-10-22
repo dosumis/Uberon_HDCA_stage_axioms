@@ -5,6 +5,16 @@
 //   options:  -M RO_2207_AS_DEFINED   read RO:0002207 by RO's current text
 //             -M NO_H1                withhold part_of temporal containment
 
+//             -M HDCA                 check HDCA tissue annotations (hdca.dl)
+//             -M EHDAA2               import EHDAA2 bounds for HDCA terms (ehdaa2.dl)
+//             -M EHDAA2_INTENDED      ... read as "starts during" / "ends during"
+
 #include "semantics.dl"
 #include "network.dl"
 #include "report.dl"
+#ifdef HDCA
+#include "hdca.dl"
+#endif
+#ifdef EHDAA2
+#include "ehdaa2.dl"
+#endif

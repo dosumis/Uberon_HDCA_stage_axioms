@@ -1,0 +1,60 @@
+// EHDAA2 stage bounds as a second source (docs/hdca-plan.md, X2).
+// Included by timing.dl when compiled with -M EHDAA2; needs -M HDCA too,
+// because the import is restricted to HDCA-relevant terms.
+//
+// EHDAA2 writes its bounds with RO:0002496 / RO:0002497, which say "starts
+// during or after" / "ends during or before". What its curators recorded is
+// the first and last stage a structure is present. Two readings:
+//   default              as written: lower bound on the start, upper on the end
+//   -M EHDAA2_INTENDED   as intended: starts during / ends during that stage
+//   -M EHDAA2_STARTS_ONLY  import start bounds only
+// Every imported bound is tagged EHDAA2 in its `why`, and can be withheld.
+
+.decl ehdaa2_bound(e: symbol, pred: symbol, stage: symbol)
+.input ehdaa2_bound(IO=file, filename="ehdaa2_bound.csv", delimiter=",", headers=true, rfc4180=true)
+
+.decl uberon_ehdaa2(uberon: symbol, ehdaa2: symbol)
+.input uberon_ehdaa2(IO=file, filename="uberon_ehdaa2.csv", delimiter=",", headers=true, rfc4180=true)
+
+// Only one-to-one cross-references: a Uberon term with exactly one EHDAA2 xref,
+// to an EHDAA2 class that no other Uberon term claims.
+.decl xrefs_of_u(u: symbol, n: number)
+xrefs_of_u(U, N) :- uberon_ehdaa2(U, _), N = count : { uberon_ehdaa2(U, _) }.
+.decl xrefs_of_e(e: symbol, n: number)
+xrefs_of_e(E, N) :- uberon_ehdaa2(_, E), N = count : { uberon_ehdaa2(_, E) }.
+.decl one_to_one(u: symbol, e: symbol)
+one_to_one(U, E) :- uberon_ehdaa2(U, E), xrefs_of_u(U, 1), xrefs_of_e(E, 1).
+
+// HDCA-relevant terms: the annotated tissues, their precursors and wholes
+// (transitively), and their direct parts.
+.decl hdca_relevant(x: symbol)
+hdca_relevant(X) :- sample(_, _, _, X, _).
+hdca_relevant(Y) :- hdca_relevant(X), edge(X, R, Y, _),
+    (R = "RO:0002202" ; R = "RO:0002207" ; R = "RO:0002494" ; R = "RO:0002495" ; R = "BFO:0000050").
+hdca_relevant(Y) :- sample(_, _, _, X, _), edge(Y, "BFO:0000050", X, _).
+
+#ifdef EHDAA2_INTENDED
+.decl reading(written: symbol, used: symbol)
+reading("RO:0002496", "RO:0002488").
+reading("RO:0002497", "RO:0002492").
+#else
+.decl reading(written: symbol, used: symbol)
+reading("RO:0002496", "RO:0002496").
+reading("RO:0002497", "RO:0002497").
+#endif
+
+// -M EHDAA2_STARTS_ONLY imports start bounds only. EHDAA2's ends are often where
+// its stage-specific vocabulary switches to finer terms ("neural tube" ends at
+// CS12), not where the structure Uberon names ceases; see docs/hdca-results.md.
+.decl imported_pred(p: symbol)
+imported_pred("RO:0002496").
+#ifndef EHDAA2_STARTS_ONLY
+imported_pred("RO:0002497").
+#endif
+
+bound(U, P2, S, W) :- ehdaa2_bound(E, P, S), imported_pred(P), one_to_one(U, E), hdca_relevant(U), reading(P, P2),
+    W = cat("EHDAA2: ", E, " ", P, " ", S, " (as ", U, ")"), !is_withheld(W).
+
+.decl ehdaa2_imported(uberon: symbol, ehdaa2: symbol)
+ehdaa2_imported(U, E) :- one_to_one(U, E), hdca_relevant(U), ehdaa2_bound(E, _, _).
+.output ehdaa2_imported(IO=file, filename="ehdaa2_imported.csv", delimiter=",", headers=true)

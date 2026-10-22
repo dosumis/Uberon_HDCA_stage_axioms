@@ -1,0 +1,19 @@
+# EHDAA2's stage bounds -> ehdaa2_bound(e, pred, stage) for datalog/ehdaa2.dl.
+# EHDAA2 bounds point at HsapDv stage classes directly.
+#
+#   robot query --input build/ehdaa2.owl --query sparql/timing/ehdaa2_bound.rq ehdaa2_bound.csv
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX obo:  <http://purl.obolibrary.org/obo/>
+
+SELECT DISTINCT ?e ?pred ?stage WHERE {
+  ?c rdfs:subClassOf ?r . ?r owl:onProperty ?p ; owl:someValuesFrom ?s .
+  VALUES ?p { obo:RO_0002496 obo:RO_0002497 }
+  FILTER(STRSTARTS(STR(?c), "http://purl.obolibrary.org/obo/EHDAA2_"))
+  FILTER(STRSTARTS(STR(?s), "http://purl.obolibrary.org/obo/HsapDv_"))
+  FILTER NOT EXISTS { ?c owl:deprecated true }
+  BIND(REPLACE(STR(?c), "^.*/([A-Za-z0-9]+)_", "$1:") AS ?e)
+  BIND(REPLACE(STR(?p), "^.*/([A-Za-z]+)_", "$1:") AS ?pred)
+  BIND(REPLACE(STR(?s), "^.*/([A-Za-z]+)_", "$1:") AS ?stage)
+}

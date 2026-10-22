@@ -1,0 +1,14 @@
+# Uberon's EHDAA2 cross-references -> uberon_ehdaa2(uberon, ehdaa2).
+# datalog/ehdaa2.dl keeps only the one-to-one ones.
+#
+#   robot query --input build/merged-full.owl --query sparql/timing/uberon_ehdaa2.rq uberon_ehdaa2.csv
+
+PREFIX oio: <http://www.geneontology.org/formats/oboInOwl#>
+
+SELECT DISTINCT ?uberon ?ehdaa2 WHERE {
+  ?c oio:hasDbXref ?x .
+  FILTER(STRSTARTS(STR(?c), "http://purl.obolibrary.org/obo/UBERON_"))
+  FILTER(STRSTARTS(STR(?x), "EHDAA2:"))
+  BIND(REPLACE(STR(?c), "^.*/UBERON_", "UBERON:") AS ?uberon)
+  BIND(STR(?x) AS ?ehdaa2)
+}

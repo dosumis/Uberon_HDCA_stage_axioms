@@ -1,0 +1,111 @@
+// HDCA tissue annotations against the timing network (docs/hdca-plan.md).
+// Included by timing.dl when compiled with -M HDCA.
+//
+// For each annotated (tissue, stage) pair: is the tissue absent, present
+// throughout, or possibly present during the stage? And for pairs that are not
+// present throughout, which developmentally related terms are?
+//
+// HDCA's choice of terms is HDCA's to make. This only reports alternatives.
+
+// ---------------------------------------------------------------- input
+
+// One row per library: from HDCA_metadata's Tier 1 table (src/taxon_stage/hdca.py).
+.decl sample(library: symbol, donor: symbol, publication: symbol, tissue: symbol, stage: symbol)
+.input sample(IO=file, filename="sample.csv", delimiter=",", headers=true, rfc4180=true)
+
+// Annotated tissues are seeds: their use on human samples says they apply to human.
+node(X) :- sample(_, _, _, X, _).
+
+.decl annotated(tissue: symbol, stage: symbol)
+annotated(X, S) :- sample(_, _, _, X, S), stage(S).
+
+// ---------------------------------------------------------------- presence
+
+// Iterate path and take points apart (see network.dl on why).
+.decl ends_by_start(x: symbol, s: symbol)      // e(X) <= start(S)
+ends_by_start(X, S) :- path($E(X), $SS(S)).
+.decl starts_from_end(x: symbol, s: symbol)    // end(S) <= s(X)
+starts_from_end(X, S) :- path($SE(S), $S(X)).
+.decl starts_by_start(x: symbol, s: symbol)    // s(X) <= start(S)
+starts_by_start(X, S) :- path($S(X), $SS(S)).
+.decl ends_from_end(x: symbol, s: symbol)      // end(S) <= e(X)
+ends_from_end(X, S) :- path($SE(S), $E(X)).
+
+// absent: X has ended by the time S starts, or starts only once S has ended.
+// present throughout: X exists from before S starts until after S ends.
+// possible: neither is entailed.
+.decl presence(x: symbol, s: symbol, status: symbol)
+presence(X, S, "absent: ended before")   :- stage(S), node(X), ends_by_start(X, S).
+presence(X, S, "absent: starts after")   :- stage(S), node(X), starts_from_end(X, S).
+presence(X, S, "present throughout")     :- stage(S), node(X), starts_by_start(X, S), ends_from_end(X, S).
+
+.decl decided(x: symbol, s: symbol)
+decided(X, S) :- presence(X, S, _).
+
+.decl annotated_presence(tissue: symbol, stage: symbol, status: symbol)
+annotated_presence(X, S, St) :- annotated(X, S), presence(X, S, St).
+annotated_presence(X, S, "possible") :- annotated(X, S), !decided(X, S).
+
+// ---------------------------------------------------------------- suggestions
+
+// Developmental steps from an annotated term to related terms: its precursors,
+// and the wholes it is part of. Up to three steps.
+.decl dev_step(x: symbol, y: symbol, kind: symbol)
+dev_step(X, Y, "precursor") :- holds(X, R, Y, _),
+    (R = "RO:0002202" ; R = "RO:0002207" ; R = "RO:0002494" ; R = "RO:0002495").
+dev_step(X, Y, "whole") :- holds(X, "BFO:0000050", Y, _), X != Y.
+
+.decl reach_dev(x: symbol, y: symbol, d: number, how: symbol)
+reach_dev(X, Y, 1, K) :- annotated(X, _), dev_step(X, Y, K).
+reach_dev(X, Z, D + 1, cat(H, " > ", K)) :- reach_dev(X, Y, D, H), D < 3, dev_step(Y, Z, K), Z != X.
+
+.decl best_dist(x: symbol, y: symbol, d: number)
+best_dist(X, Y, D) :- reach_dev(X, Y, _, _), D = min E : { reach_dev(X, Y, E, _) }.
+
+// A candidate exists at the stage when it has certainly started by the end of
+// the stage and is not entailed absent. "Present throughout" would be the
+// stronger test, but almost no precursor has a curated end, so it finds nothing.
+.decl started_by_end(y: symbol, s: symbol)     // s(Y) < end(S)
+started_by_end(Y, S) :- spath($S(Y), $SE(S)).
+.decl at_stage(y: symbol, s: symbol)
+at_stage(Y, S) :- started_by_end(Y, S), stage(S), !presence(Y, S, "absent: ended before"),
+    !presence(Y, S, "absent: starts after").
+
+// Abstract classifiers make useless suggestions ("anatomical system"). The
+// latent countability assessment (docs/countability/) marks them TYPE.
+.decl countability(id: symbol, label: symbol, source: symbol, category: symbol, n: symbol,
+                   sided: symbol, confidence: symbol, note: symbol, votes: symbol, curator: symbol)
+.input countability(IO=file, filename="countability.tsv", delimiter="\t", headers=true)
+.decl abstract_type(y: symbol)
+abstract_type(Y) :- countability(Y, _, _, "TYPE", _, _, _, _, _, _).
+abstract_type("UBERON:0000468").  // multicellular organism
+abstract_type("UBERON:0000922").  // embryo
+abstract_type("UBERON:0000467").  // anatomical system
+
+// A suggestion: a related term that exists at the annotated stage, for an
+// annotation that is not present throughout it. Precursor-only chains rank
+// first, then chains through wholes.
+.decl suggestion(tissue: symbol, stage: symbol, suggested: symbol, distance: number, how: symbol)
+suggestion(X, S, Y, D, H) :- annotated_presence(X, S, St), St != "present throughout",
+    best_dist(X, Y, D), reach_dev(X, Y, D, H), at_stage(Y, S), !abstract_type(Y).
+
+.decl precursor_only(how: symbol)
+precursor_only("precursor").
+precursor_only("precursor > precursor").
+precursor_only("precursor > precursor > precursor").
+
+// ---------------------------------------------------------------- report
+
+.decl hdca_presence(tissue: symbol, tissue_label: symbol, stage: symbol, stage_label: symbol,
+                    status: symbol, libraries: number)
+hdca_presence(X, XL, S, SL, St, N) :- annotated_presence(X, S, St), name(X, XL), name(S, SL),
+    N = count : { sample(_, _, _, X, S) }.
+.output hdca_presence(IO=file, filename="hdca_presence.csv", delimiter=",", headers=true, rfc4180=true)
+
+.decl hdca_suggestion(tissue_label: symbol, stage_label: symbol, status: symbol, rank: symbol,
+                      suggested: symbol, suggested_label: symbol, distance: number, how: symbol)
+hdca_suggestion(XL, SL, St, "1 precursor", Y, YL, D, H) :- suggestion(X, S, Y, D, H), precursor_only(H),
+    annotated_presence(X, S, St), name(X, XL), name(S, SL), name(Y, YL).
+hdca_suggestion(XL, SL, St, "2 via whole", Y, YL, D, H) :- suggestion(X, S, Y, D, H), !precursor_only(H),
+    annotated_presence(X, S, St), name(X, XL), name(S, SL), name(Y, YL).
+.output hdca_suggestion(IO=file, filename="hdca_suggestion.csv", delimiter=",", headers=true, rfc4180=true)

@@ -10,7 +10,7 @@ TAXON_LABEL ?= Homo sapiens
 TABLE  := src/axioms.tsv
 BUILD  := build
 
-.PHONY: all check validate axioms scoped materialize reach facts timing contribute test clean
+.PHONY: all check validate axioms scoped materialize reach facts timing hdca contribute test clean FORCE
 all: check validate axioms
 
 check:                         ## structural validation of the table
@@ -87,6 +87,8 @@ TIMING := $(BUILD)/timing
 FACTS  := $(TIMING)/facts
 HSAPDV_URL ?= http://purl.obolibrary.org/obo/hsapdv.owl
 SOUFFLE_FLAGS ?=
+# Soufflé takes one -M with space-separated macros: MACROS="NO_H1 HDCA".
+MACROS ?=
 
 $(BUILD)/hsapdv.owl:
 	curl -sSL -o $@ $(HSAPDV_URL)
@@ -120,12 +122,45 @@ facts: $(TIMING_FACTS)         ## export timing facts from the artefacts
 # withholds every axiom the previous pass's conflicts involve, until none
 # remain; $(TIMING)/out is the last pass, whose bounds come from a consistent
 # remainder. What was withheld, and why, is in each pass's facts/withheld.tsv.
-timing: $(TIMING_FACTS) datalog/*.dl  ## reason over timing; SOUFFLE_FLAGS="-M NO_H1" etc.
+# HDCA tissue annotations (docs/hdca-plan.md). HDCA_TIER1 is HDCA_metadata's
+# filled Tier 1 table; its path has spaces, so it is not a make prerequisite.
+HDCA_TIER1 ?= ../HDCA_metadata/reports/tier1_filled/hdca_reprocessing - Tier 1 metadata (sex+stage+tissue+pcw).csv
+EHDAA2_URL ?= http://purl.obolibrary.org/obo/ehdaa2.owl
+EHDAA2_MACROS ?= EHDAA2
+HDCA_MACROS ?=
+HDCA_RUN ?=
+HDCA_FACTS := $(addprefix $(FACTS)/,sample.csv ehdaa2_bound.csv uberon_ehdaa2.csv countability.tsv)
+
+$(BUILD)/ehdaa2.owl:
+	curl -sSL -o $@ $(EHDAA2_URL)
+$(FACTS)/sample.csv: FORCE
+	@mkdir -p $(FACTS)
+	PYTHONPATH=src python3 -m taxon_stage.hdca "$(HDCA_TIER1)" $@
+$(FACTS)/ehdaa2_bound.csv: $(BUILD)/ehdaa2.owl sparql/timing/ehdaa2_bound.rq
+	@mkdir -p $(FACTS)
+	$(ROBOT) query --input $< --query sparql/timing/ehdaa2_bound.rq $@
+$(FACTS)/uberon_ehdaa2.csv: $(BUILD)/merged-full.owl sparql/timing/uberon_ehdaa2.rq
+	@mkdir -p $(FACTS)
+	$(ROBOT) query --input $< --query sparql/timing/uberon_ehdaa2.rq $@
+$(FACTS)/countability.tsv: docs/countability/classification.tsv
+	@mkdir -p $(FACTS)
+	cp $< $@
+FORCE:
+
+# make hdca                      HDCA check with EHDAA2 bounds as written
+# make hdca HDCA_RUN_NAME=intended HDCA_MACROS=EHDAA2_INTENDED
+# make hdca HDCA_RUN_NAME=baseline EHDAA2_MACROS=
+HDCA_RUN_NAME ?= written
+hdca:                          ## check HDCA tissue annotations against the timing network
+	$(MAKE) timing TIMING=$(BUILD)/hdca-$(HDCA_RUN_NAME) HDCA_RUN=1 \
+	  MACROS="HDCA $(EHDAA2_MACROS) $(HDCA_MACROS) $(MACROS)"
+
+timing: $(TIMING_FACTS) $(if $(HDCA_RUN),$(HDCA_FACTS)) datalog/*.dl  ## reason over timing; MACROS="NO_H1" etc.
 	@rm -rf $(TIMING)/pass* $(TIMING)/out
 	@set -e; i=1; facts=$(FACTS); \
 	while :; do \
 	  out=$(TIMING)/pass$$i; mkdir -p $$out; \
-	  souffle $(SOUFFLE_FLAGS) -F $$facts -D $$out datalog/timing.dl; \
+	  souffle $(SOUFFLE_FLAGS) $(if $(strip $(MACROS)),-M "$(strip $(MACROS))") -F $$facts -D $$out datalog/timing.dl; \
 	  n=$$(( $$(wc -l < $$out/withhold_next.tsv) - 1 )); \
 	  echo "pass $$i: $$(( $$(wc -l < $$out/conflict.csv) - 1 )) conflicting bound pairs," \
 	    "$$(( $$(wc -l < $$out/cycle.csv) - 1 )) structural cycle edges," \
