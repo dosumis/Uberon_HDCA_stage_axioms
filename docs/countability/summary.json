@@ -1,0 +1,207 @@
+{
+ "problems": [],
+ "ehdaa2": {
+  "n": 2456,
+  "missing": 0,
+  "dist": {
+   "ONE": 880,
+   "FIXED": 723,
+   "MEMBER": 642,
+   "GROUP": 114,
+   "MANY": 89,
+   "TYPE": 8
+  },
+  "countable": 2359,
+  "countable_sided": 1221,
+  "one_or_member_unsided": 1066,
+  "countable_variable": 11,
+  "confidence": {
+   "H": 1902,
+   "L": 33,
+   "M": 521
+  },
+  "staged": [
+   2444,
+   {
+    "ONE": 879,
+    "FIXED": 723,
+    "MEMBER": 642,
+    "GROUP": 105,
+    "MANY": 89,
+    "TYPE": 6
+   }
+  ],
+  "develops_from_edges": {
+   "n": 2125,
+   "both_countable": 1951,
+   "precursor_uncountable": 88,
+   "product_uncountable": 50,
+   "neither": 36
+  },
+  "examples": {
+   "MEMBER": [
+    "early rhombomere 07",
+    "vertebral cartilage condensation T02",
+    "coccygeal vertebral cartilage condensation CC4",
+    "rhombomere 05 alar plate",
+    "dermomyotome 01",
+    "thoracic vertebral pre-cartilage condensation T01",
+    "dermomyotome 17",
+    "myotome 34",
+    "myotome 24",
+    "finger 3",
+    "2nd arch artery",
+    "interdigital region between fingers 1 and 2"
+   ],
+   "FIXED": [
+    "testis",
+    "early trigeminal pontine sensory nucleus",
+    "cerebellum primordium",
+    "telencephalon lateral wall",
+    "acoustico-facial VII-VIII ganglion complex",
+    "early superior salivatory nucleus",
+    "lens placode",
+    "olfactory cortex",
+    "pleural cavity",
+    "accessory XI nerve cranial component",
+    "lateral ventricle choroid plexus",
+    "glossopharyngeal IX ganglion superior ganglion"
+   ],
+   "ONE": [
+    "liver right lobe primitive bare area",
+    "ventral pancreas",
+    "midgut region",
+    "ventral pancreas head parenchyma",
+    "pelvic girdle muscle system",
+    "common cardinal vein right",
+    "hindgut mesothelium",
+    "inner cell mass",
+    "inferior vena cava valve",
+    "axial skeleton",
+    "right lung upper lobe respiratory tree",
+    "membranous interventricular septum mesenchyme"
+   ],
+   "GROUP": [
+    "oral region gland group",
+    "left ventricle papillary muscles",
+    "valve mesenchyme",
+    "right lung upper lobe segmental bronchus",
+    "hyoid muscle",
+    "5-7 cervical nephrotomes",
+    "right lung lower lobe segmental bronchus",
+    "finger 3 phalanx pre-cartilage condensation",
+    "spinal nerves",
+    "cervical vertebral cartilage condensation group",
+    "head dermomyotome group",
+    "nasal conchae"
+   ],
+   "MANY": [
+    "allantois primordial germ cells",
+    "mesonephros primordial germ cells",
+    "gonadal ridge primordial germ cells",
+    "cervical lateral migration pathway NC-derived mesenchyme",
+    "lateral ventricle choroid plexus capillaries",
+    "mesoderm blood islands",
+    "liver right quadrate lobe hepatic sinusoid linings",
+    "cardiac veins",
+    "serum",
+    "right lung middle lobe bronchiole",
+    "subepicardial vasculoplexus capillaries",
+    "liver capillary plexus"
+   ],
+   "TYPE": [
+    "body arteries",
+    "foregut-midgut junction gland",
+    "integumental system gland",
+    "foregut gland",
+    "Abstract human developmental anatomy",
+    "valve",
+    "CNS ganglion",
+    "body veins"
+   ]
+  }
+ },
+ "uberon_network": {
+  "n": 778,
+  "missing": 0,
+  "dist": {
+   "ONE": 265,
+   "FIXED": 89,
+   "MEMBER": 142,
+   "GROUP": 72,
+   "MANY": 47,
+   "TYPE": 163
+  },
+  "countable": 568,
+  "seeds": {
+   "n": 310,
+   "dist": {
+    "ONE": 67,
+    "FIXED": 38,
+    "MEMBER": 129,
+    "GROUP": 47,
+    "MANY": 28,
+    "TYPE": 1
+   },
+   "countable": 281
+  }
+ },
+ "agreement": {
+  "items": 50,
+  "raters_per_item": 8.0,
+  "pairwise_category": 0.934,
+  "pairwise_countable": 1.0,
+  "unanimous_items": 43,
+  "disagreements": [
+   [
+    "vitelline vein right",
+    {
+     "MEMBER": 4,
+     "ONE": 4
+    }
+   ],
+   [
+    "left venous valve",
+    {
+     "MEMBER": 3,
+     "ONE": 5
+    }
+   ],
+   [
+    "supracardinal vein right",
+    {
+     "MEMBER": 4,
+     "ONE": 4
+    }
+   ],
+   [
+    "1st arch mandibular mesenchyme",
+    {
+     "MEMBER": 7,
+     "FIXED": 1
+    }
+   ],
+   [
+    "vitelline artery left",
+    {
+     "MEMBER": 4,
+     "ONE": 4
+    }
+   ],
+   [
+    "lower jaw incisor",
+    {
+     "FIXED": 5,
+     "GROUP": 3
+    }
+   ],
+   [
+    "4th arch artery right",
+    {
+     "MEMBER": 7,
+     "ONE": 1
+    }
+   ]
+  ]
+ }
+}
